@@ -5,11 +5,6 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { z } from "zod";
 import type { TruoraCheckResult } from "./truora";
 
-const openrouter = createOpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY ?? "",
-});
-
 export type KycDecision = "APROBADO" | "RECHAZADO" | "REVISION_MANUAL";
 
 export interface KycSynthesis {
@@ -24,6 +19,7 @@ export interface KycSynthesis {
   };
 }
 
+// Subset que devuelve el LLM — audit_log se construye aparte desde datos raw
 const schema = z.object({
   decision: z.enum(["APROBADO", "RECHAZADO", "REVISION_MANUAL"]),
   confidence: z.number().min(0).max(1),
@@ -34,12 +30,28 @@ const schema = z.object({
 export async function synthesizeKyc(
   check: TruoraCheckResult
 ): Promise<KycSynthesis> {
-  const { object } = await generateObject({
-    model: openrouter("meta-llama/llama-3.1-8b-instruct:free"),
-    schema,
-    system:
-      "Eres un sistema de decisión KYC bancario. Basándote en los resultados de verificación de identidad, toma una decisión de onboarding. Responde siempre en español.",
-    prompt: `Analiza los siguientes resultados de verificación KYC y toma una decisión de onboarding:
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) {
+    throw new Error("OPENROUTER_API_KEY no está configurada");
+  }
+
+  const openrouter = createOpenAI({
+    baseURL: "https://openrouter.ai/api/v1",
+    apiKey,
+  });
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15_000);
+
+  let object: z.infer<typeof schema>;
+  try {
+    const result = await generateObject({
+      model: openrouter("meta-llama/llama-3.1-8b-instruct:free"),
+      schema,
+      abortSignal: controller.signal,
+      system:
+        "Eres un sistema de decisión KYC bancario. Basándote en los resultados de verificación de identidad, toma una decisión de onboarding. Responde siempre en español.",
+      prompt: `Analiza los siguientes resultados de verificación KYC y toma una decisión de onboarding:
 
 - Identidad confirmada: ${check.identity_confirmed}
 - Documento válido: ${check.document_valid}
@@ -49,7 +61,11 @@ export async function synthesizeKyc(
 - PEP detectado: ${check.pep_hit ? "SÍ — persona políticamente expuesta" : "NO"}
 
 Devuelve una decisión (APROBADO, RECHAZADO, o REVISION_MANUAL), un nivel de confianza entre 0 y 1, un resumen ejecutivo y una lista de razones que justifiquen la decisión.`,
-  });
+    });
+    object = result.object;
+  } finally {
+    clearTimeout(timeout);
+  }
 
   const audit_log = {
     document_check: check.document_valid

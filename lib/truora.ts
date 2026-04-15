@@ -2,6 +2,8 @@
 
 const TRUORA_BASE = "https://api.truora.com";
 
+export type KycScenario = "aprobado" | "rechazado" | "revision_manual";
+
 export interface TruoraCheckResult {
   check_id: string;
   status: "pending" | "completed" | "error";
@@ -14,10 +16,9 @@ export interface TruoraCheckResult {
   details: Record<string, unknown>;
 }
 
-// Mock que simula respuesta de Truora para demo
-function getMockCheckResult(): TruoraCheckResult {
-  return {
-    check_id: `mock_${Date.now()}`,
+const MOCK_SCENARIOS: Record<KycScenario, TruoraCheckResult> = {
+  aprobado: {
+    check_id: "",
     status: "completed",
     identity_confirmed: true,
     sanctions_hit: false,
@@ -25,8 +26,36 @@ function getMockCheckResult(): TruoraCheckResult {
     document_valid: true,
     face_match_score: 0.94,
     liveness_passed: true,
-    details: { source: "mock", note: "Demo — connect Truora API for real KYC" },
-  };
+    details: { source: "mock", scenario: "aprobado" },
+  },
+  rechazado: {
+    check_id: "",
+    status: "completed",
+    identity_confirmed: false,
+    sanctions_hit: true,
+    pep_hit: false,
+    document_valid: false,
+    face_match_score: 0.31,
+    liveness_passed: false,
+    details: { source: "mock", scenario: "rechazado", reason: "sanctions_hit + document_invalid" },
+  },
+  revision_manual: {
+    check_id: "",
+    status: "completed",
+    identity_confirmed: true,
+    sanctions_hit: false,
+    pep_hit: true,
+    document_valid: true,
+    face_match_score: 0.62,
+    liveness_passed: true,
+    details: { source: "mock", scenario: "revision_manual", reason: "pep_detected + low_face_score" },
+  },
+};
+
+function parseScenario(checkId: string): KycScenario {
+  if (checkId.includes("rechazado")) return "rechazado";
+  if (checkId.includes("revision_manual")) return "revision_manual";
+  return "aprobado";
 }
 
 function isMockMode(): boolean {
@@ -45,14 +74,15 @@ async function request<T>(
     method,
     headers: {
       "Content-Type": "application/json",
-      "Truora-API-Key": process.env.TRUORA_API_KEY!,
+      "Truora-API-Key": process.env.TRUORA_API_KEY ?? "",
     },
     body: body ? JSON.stringify(body) : undefined,
   });
 
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`Truora ${method} ${path} → ${res.status}: ${text}`);
+    // Log detalle solo en servidor, no exponer al cliente
+    console.error(`Truora ${method} ${path} → ${res.status}`);
+    throw new Error(`Truora API error: ${res.status}`);
   }
 
   return res.json() as Promise<T>;
@@ -62,9 +92,11 @@ export async function createCheck(payload: {
   document_id: string;
   country: string;
   type: "id_verification" | "background_check" | "kyc_full";
+  scenario?: KycScenario;
 }) {
   if (isMockMode()) {
-    return { check_id: "mock_" + Date.now() };
+    const scenario = payload.scenario ?? "aprobado";
+    return { check_id: `mock_${scenario}_${Date.now()}` };
   }
   return request<{ check_id: string }>("POST", "/v1/checks", payload);
 }
@@ -77,9 +109,9 @@ export async function pollCheck(
   checkId: string,
   maxWaitMs = 30_000
 ): Promise<TruoraCheckResult> {
-  // Si es mock, devolver resultado directamente sin fetch
   if (checkId.startsWith("mock_")) {
-    return getMockCheckResult();
+    const scenario = parseScenario(checkId);
+    return { ...MOCK_SCENARIOS[scenario], check_id: checkId };
   }
 
   const start = Date.now();
