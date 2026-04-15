@@ -51,7 +51,7 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Topbar */}
-      <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-0 h-14 flex items-center justify-between gap-3 flex-wrap">
+      <header className="bg-gray-950 border-b border-white/10 px-4 sm:px-6 py-0 h-14 flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-900 shrink-0">
             <svg className="h-4 w-4 text-white" viewBox="0 0 16 16" fill="none">
@@ -59,18 +59,18 @@ export default function AdminPage() {
             </svg>
           </div>
           <div className="flex items-center gap-2">
-            <h1 className="text-sm font-semibold text-gray-900 tracking-tight">Panel KYC</h1>
-            <span className="h-4 w-px bg-gray-200" />
-            <p className="text-xs text-gray-400 hidden sm:block">Administración de verificaciones</p>
+            <h1 className="text-sm font-semibold text-white tracking-tight">Panel KYC</h1>
+            <span className="h-4 w-px bg-white/20" />
+            <p className="text-xs text-gray-500 hidden sm:block">Administración de verificaciones</p>
           </div>
           {/* Badge de datos demo visible en el header */}
-          <span className="rounded-full border border-dashed border-gray-300 px-2 py-0.5 text-xs text-gray-400">
+          <span className="rounded-full border border-dashed border-white/20 px-2 py-0.5 text-xs text-gray-500">
             Datos simulados
           </span>
         </div>
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-all"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-gray-300 hover:bg-white/10 transition-all"
         >
           <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none">
             <path d="M7.5 2L3 6l4.5 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
