@@ -1,15 +1,15 @@
 // Síntesis LLM — toma todos los resultados de Truora y genera decisión final
 
-import { generateText } from "ai";
-import { createOpenAI } from "@ai-sdk/openai";
 import { z } from "zod";
+import { chat, AllProvidersFailedError } from "@/ai-kit/client";
+import type { UserApiKey } from "@/ai-kit/types";
 import type { TruoraCheckResult } from "./truora";
 
 export type KycDecision = "APROBADO" | "RECHAZADO" | "REVISION_MANUAL";
 
 export interface KycSynthesis {
   decision: KycDecision;
-  confidence: number; // 0-1
+  confidence: number;
   summary: string;
   reasons: string[];
   audit_log: {
@@ -17,9 +17,11 @@ export interface KycSynthesis {
     face_check: string;
     sanctions_check: string;
   };
+  provider?: string;
+  model?: string;
+  latency_ms?: number;
 }
 
-// Subset que devuelve el LLM — audit_log se construye aparte desde datos raw
 const schema = z.object({
   decision: z.enum(["APROBADO", "RECHAZADO", "REVISION_MANUAL"]),
   confidence: z.number().min(0).max(1),
@@ -64,41 +66,34 @@ function mockSynthesis(check: TruoraCheckResult): KycSynthesis {
     confidence,
     summary: summaries[decision],
     reasons: reasons[decision],
-    audit_log: {
-      document_check: check.document_valid ? "Documento válido y verificado" : "Documento no válido o no verificado",
-      face_check: check.face_match_score !== undefined
+    audit_log: buildAuditLog(check),
+  };
+}
+
+function buildAuditLog(check: TruoraCheckResult) {
+  return {
+    document_check: check.document_valid
+      ? "Documento válido y verificado"
+      : "Documento no válido o no verificado",
+    face_check:
+      check.face_match_score !== undefined
         ? `Face match score: ${(check.face_match_score * 100).toFixed(0)}%${check.liveness_passed ? " — Liveness OK" : " — Liveness fallido"}`
         : "Face match no disponible",
-      sanctions_check: check.sanctions_hit
-        ? `Sanciones: POSITIVO${check.pep_hit ? " | PEP: SÍ" : ""}`
-        : `Sanciones: Limpio${check.pep_hit ? " | PEP: SÍ" : " | PEP: No"}`,
-    },
+    sanctions_check: check.sanctions_hit
+      ? `Sanciones: POSITIVO${check.pep_hit ? " | PEP: SÍ" : ""}`
+      : `Sanciones: Limpio${check.pep_hit ? " | PEP: SÍ" : " | PEP: No"}`,
   };
 }
 
 export async function synthesizeKyc(
-  check: TruoraCheckResult
+  check: TruoraCheckResult,
+  userApiKey?: UserApiKey,
 ): Promise<KycSynthesis> {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey) {
-    // Sin API key: usar síntesis determinista basada en los datos del check
-    console.info("[synthesizer] OPENROUTER_API_KEY no configurada — usando mock de síntesis");
-    return mockSynthesis(check);
-  }
-
-  const openrouter = createOpenAI({
-    baseURL: "https://openrouter.ai/api/v1",
-    apiKey,
-  });
-
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15_000);
 
-  let object: z.infer<typeof schema>;
   try {
-    const { text } = await generateText({
-      model: openrouter("openai/gpt-oss-20b:free"),
-      abortSignal: controller.signal,
+    const response = await chat({
       messages: [
         {
           role: "system",
@@ -125,12 +120,14 @@ Responde EXACTAMENTE con este formato JSON (sin nada más):
 }`,
         },
       ],
+      maxTokens: 512,
+      signal: controller.signal,
+      userApiKey,
     });
 
-    // Extraer JSON del texto (Gemma a veces añade markdown alrededor)
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    const jsonMatch = response.text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.warn("[synthesizer] No se pudo extraer JSON de la respuesta — usando mock");
+      console.warn("[synthesizer] No se pudo extraer JSON — usando mock");
       return mockSynthesis(check);
     }
 
@@ -139,29 +136,24 @@ Responde EXACTAMENTE con este formato JSON (sin nada más):
       console.warn("[synthesizer] JSON inválido según schema — usando mock", parsed.error);
       return mockSynthesis(check);
     }
-    object = parsed.data;
+
+    return {
+      decision: parsed.data.decision,
+      confidence: parsed.data.confidence,
+      summary: parsed.data.summary,
+      reasons: parsed.data.reasons,
+      audit_log: buildAuditLog(check),
+      provider: response.provider,
+      model: response.model,
+      latency_ms: response.latency_ms,
+    };
+  } catch (err) {
+    if (err instanceof AllProvidersFailedError) {
+      console.warn("[synthesizer] Todos los providers fallaron — usando mock determinista");
+      return mockSynthesis(check);
+    }
+    throw err;
   } finally {
     clearTimeout(timeout);
   }
-
-  const audit_log = {
-    document_check: check.document_valid
-      ? "Documento válido y verificado"
-      : "Documento no válido o no verificado",
-    face_check:
-      check.face_match_score !== undefined
-        ? `Face match score: ${(check.face_match_score * 100).toFixed(0)}%${check.liveness_passed ? " — Liveness OK" : " — Liveness fallido"}`
-        : "Face match no disponible",
-    sanctions_check: check.sanctions_hit
-      ? `Sanciones: POSITIVO${check.pep_hit ? " | PEP: SÍ" : ""}`
-      : `Sanciones: Limpio${check.pep_hit ? " | PEP: SÍ" : " | PEP: No"}`,
-  };
-
-  return {
-    decision: object.decision,
-    confidence: object.confidence,
-    summary: object.summary,
-    reasons: object.reasons,
-    audit_log,
-  };
 }
