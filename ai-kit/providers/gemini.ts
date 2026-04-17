@@ -21,22 +21,23 @@ export function createGeminiProvider(apiKey: string | undefined): LLMProvider {
         throw new ProviderError("gemini", undefined);
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      // webpackIgnore: package only needed at runtime; not bundled by Turbopack
-      const { GoogleGenAI } = await import(/* webpackIgnore: true */ "@google/genai" as any);
-      const genai = new GoogleGenAI({ apiKey });
-
       const start = Date.now();
 
-      const systemMsg = opts.messages.find((m) => m.role === "system");
-      const userMessages = opts.messages.filter((m) => m.role !== "system");
-
-      const contents = userMessages.map((m) => ({
-        role: m.role === "assistant" ? "model" : "user",
-        parts: [{ text: m.content }],
-      }));
-
       try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // webpackIgnore: package only needed at runtime (BYOK); not bundled by Turbopack
+        const { GoogleGenAI } = await import(/* webpackIgnore: true */ "@google/genai" as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const genai: any = new GoogleGenAI({ apiKey });
+
+        const systemMsg = opts.messages.find((m) => m.role === "system");
+        const userMessages = opts.messages.filter((m) => m.role !== "system");
+
+        const contents = userMessages.map((m) => ({
+          role: m.role === "assistant" ? "model" : "user",
+          parts: [{ text: m.content }],
+        }));
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const response: any = await genai.models.generateContent({
           model: DEFAULT_MODEL,

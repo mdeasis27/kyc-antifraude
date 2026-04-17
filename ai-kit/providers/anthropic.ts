@@ -17,19 +17,20 @@ export function createAnthropicProvider(apiKey: string): LLMProvider {
     },
 
     async chat(opts: ChatOptions): Promise<ChatResponse> {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      // webpackIgnore: package only needed at runtime (BYOK); not bundled by Turbopack
-      const { default: Anthropic } = await import(/* webpackIgnore: true */ "@anthropic-ai/sdk" as any);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const client: any = new Anthropic({ apiKey });
-
       const start = Date.now();
-      const systemMsg = opts.messages.find((m) => m.role === "system")?.content;
-      const messages = opts.messages
-        .filter((m) => m.role !== "system")
-        .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
 
       try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // webpackIgnore: package only needed at runtime (BYOK); not bundled by Turbopack
+        const { default: Anthropic } = await import(/* webpackIgnore: true */ "@anthropic-ai/sdk" as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const client: any = new Anthropic({ apiKey });
+
+        const systemMsg = opts.messages.find((m) => m.role === "system")?.content;
+        const messages = opts.messages
+          .filter((m) => m.role !== "system")
+          .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const response: any = await client.messages.create({
           model: DEFAULT_MODEL,
