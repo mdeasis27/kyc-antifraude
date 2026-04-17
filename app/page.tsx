@@ -230,7 +230,7 @@ export default function Home() {
                       : "border border-transparent text-gray-500 hover:text-gray-300 hover:bg-white/5"
                   }`}
                 >
-                  <span className={`h-2 w-2 rounded-full ${s.dot} flex-shrink-0`} />
+                  <span className={`h-2 w-2 rounded-full ${s.dot} shrink-0`} />
                   {s.label}
                   {scenario === s.value && (
                     <span className="ml-auto">
@@ -375,7 +375,7 @@ export default function Home() {
                   {loading ? (
                     <div className="rounded-xl border border-gray-100 bg-gray-50 p-6 space-y-5">
                       <div className="flex items-center gap-3">
-                        <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-200 border-t-gray-900 flex-shrink-0" />
+                        <div className="h-5 w-5 animate-spin rounded-full border-2 border-gray-200 border-t-gray-900 shrink-0" />
                         <span className="text-sm font-medium text-gray-800">{LOADING_STEPS[loadingStep]}</span>
                       </div>
                       <div className="space-y-2.5">
@@ -383,7 +383,7 @@ export default function Home() {
                           const i = LOADING_STEPS.indexOf(label);
                           return (
                             <div key={label} className="flex items-center gap-3">
-                              <div className={`h-5 w-5 rounded-full flex-shrink-0 flex items-center justify-center border transition-all ${
+                              <div className={`h-5 w-5 rounded-full shrink-0 flex items-center justify-center border transition-all ${
                                 i < loadingStep
                                   ? "bg-emerald-500 border-emerald-500"
                                   : i === loadingStep
@@ -469,7 +469,7 @@ export default function Home() {
                 <div className="step-panel">
                   {/* Header coloreado */}
                   <div className={`${cfg.headerBg} px-6 py-5 flex items-center gap-4`}>
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 flex-shrink-0">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 shrink-0">
                       {synthesis.decision === "APROBADO" && (
                         <svg className="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none">
                           <path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -516,7 +516,7 @@ export default function Home() {
                         <ul className="space-y-1.5">
                           {synthesis.reasons.map((r) => (
                             <li key={r} className="flex items-start gap-2 text-sm text-gray-600">
-                              <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-gray-400 flex-shrink-0" />
+                              <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-gray-400 shrink-0" />
                               {r}
                             </li>
                           ))}
