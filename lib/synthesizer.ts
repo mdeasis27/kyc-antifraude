@@ -97,7 +97,7 @@ export async function synthesizeKyc(
   let object: z.infer<typeof schema>;
   try {
     const { text } = await generateText({
-      model: openrouter("google/gemma-4-31b-it:free"),
+      model: openrouter("openai/gpt-oss-20b:free"),
       abortSignal: controller.signal,
       messages: [
         {
