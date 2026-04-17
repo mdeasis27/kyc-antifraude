@@ -22,7 +22,8 @@ export function createGeminiProvider(apiKey: string | undefined): LLMProvider {
       }
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { GoogleGenAI } = await import("@google/genai" as any);
+      // webpackIgnore: package only needed at runtime; not bundled by Turbopack
+      const { GoogleGenAI } = await import(/* webpackIgnore: true */ "@google/genai" as any);
       const genai = new GoogleGenAI({ apiKey });
 
       const start = Date.now();

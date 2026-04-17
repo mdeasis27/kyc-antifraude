@@ -18,7 +18,8 @@ export function createAnthropicProvider(apiKey: string): LLMProvider {
 
     async chat(opts: ChatOptions): Promise<ChatResponse> {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { default: Anthropic } = await import("@anthropic-ai/sdk" as any);
+      // webpackIgnore: package only needed at runtime (BYOK); not bundled by Turbopack
+      const { default: Anthropic } = await import(/* webpackIgnore: true */ "@anthropic-ai/sdk" as any);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const client: any = new Anthropic({ apiKey });
 
