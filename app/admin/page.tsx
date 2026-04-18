@@ -49,28 +49,27 @@ const avgConfidence = MOCK_RECORDS.reduce((acc, r) => acc + r.confidence, 0) / t
 
 export default function AdminPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Topbar */}
-      <header className="bg-gray-950 border-b border-white/10 px-4 sm:px-6 py-0 h-14 flex items-center justify-between gap-3 flex-wrap">
+      <header className="bg-background border-b shadow-[var(--shadow-border-light)] px-4 sm:px-6 py-0 h-14 flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-900 shrink-0">
-            <svg className="h-4 w-4 text-white" viewBox="0 0 16 16" fill="none">
+          <div className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] shadow-[var(--shadow-card)] shrink-0">
+            <svg className="h-4 w-4 text-foreground" viewBox="0 0 16 16" fill="none">
               <path d="M8 1.5L2 4v4c0 3.5 2.5 5.8 6 6.5 3.5-.7 6-3 6-6.5V4L8 1.5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
             </svg>
           </div>
           <div className="flex items-center gap-2">
-            <h1 className="text-sm font-semibold text-white tracking-tight">Panel KYC</h1>
-            <span className="h-4 w-px bg-white/20" />
-            <p className="text-xs text-gray-500 hidden sm:block">Administración de verificaciones</p>
+            <h1 className="text-sm font-semibold text-foreground tracking-tight">Panel KYC</h1>
+            <span className="h-4 w-px bg-[var(--border)]" />
+            <p className="text-xs text-[var(--muted-foreground)] hidden sm:block">Administración de verificaciones</p>
           </div>
-          {/* Badge de datos demo visible en el header */}
-          <span className="rounded-full border border-dashed border-white/20 px-2 py-0.5 text-xs text-gray-500">
+          <span className="rounded-full shadow-[var(--shadow-border-light)] px-2 py-0.5 text-xs text-[var(--muted-foreground)]">
             Datos simulados
           </span>
         </div>
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-gray-300 hover:bg-white/10 transition-all"
+          className="inline-flex items-center gap-1.5 rounded-[var(--radius-md)] shadow-[var(--shadow-border-light)] px-3 py-1.5 text-xs font-medium text-[var(--muted-foreground)] hover:text-foreground hover:bg-[var(--gray-50)] transition-all"
         >
           <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none">
             <path d="M7.5 2L3 6l4.5 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -82,17 +81,17 @@ export default function AdminPage() {
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
         {/* Métricas */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <MetricCard label="Total verificaciones" value={total} accent="border-gray-300" />
-          <MetricCard label="Aprobados" value={aprobados} sub={`${((aprobados / total) * 100).toFixed(0)}% del total`} color="text-green-600" accent="border-green-400" />
-          <MetricCard label="Rechazados" value={rechazados} sub={`${((rechazados / total) * 100).toFixed(0)}% del total`} color="text-red-600" accent="border-red-400" />
-          <MetricCard label="Revisión manual" value={revision} sub={`${((revision / total) * 100).toFixed(0)}% del total`} color="text-amber-600" accent="border-amber-400" />
+          <MetricCard label="Total verificaciones" value={total} accentClass="border-[var(--border)]" />
+          <MetricCard label="Aprobados" value={aprobados} sub={`${((aprobados / total) * 100).toFixed(0)}% del total`} color="text-green-600" accentClass="border-green-400" />
+          <MetricCard label="Rechazados" value={rechazados} sub={`${((rechazados / total) * 100).toFixed(0)}% del total`} color="text-red-600" accentClass="border-red-400" />
+          <MetricCard label="Revisión manual" value={revision} sub={`${((revision / total) * 100).toFixed(0)}% del total`} color="text-amber-600" accentClass="border-amber-400" />
         </div>
 
         {/* Barra de distribución */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-5">
+        <div className="bg-[var(--card)] rounded-[var(--radius-lg)] shadow-[var(--shadow-card)] p-5">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-gray-700">Distribución de decisiones</h2>
-            <span className="text-xs text-gray-400">
+            <h2 className="text-sm font-semibold text-foreground">Distribución de decisiones</h2>
+            <span className="text-xs text-[var(--muted-foreground)]">
               Confianza promedio: {(avgConfidence * 100).toFixed(0)}%
             </span>
           </div>
@@ -113,18 +112,18 @@ export default function AdminPage() {
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-1.5">
                 <span className={`h-2 w-2 rounded-full ${item.color}`} />
-                <span className="text-xs text-gray-500">{item.label}</span>
+                <span className="text-xs text-[var(--muted-foreground)]">{item.label}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Tabla de verificaciones */}
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
+        <div className="bg-[var(--card)] rounded-[var(--radius-lg)] shadow-[var(--shadow-card)] overflow-hidden">
+          <div className="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between flex-wrap gap-3">
             <div>
-              <h2 className="text-sm font-semibold text-gray-700">Verificaciones recientes</h2>
-              <p className="text-xs text-gray-400 mt-0.5">{total} registros hoy</p>
+              <h2 className="text-sm font-semibold text-foreground">Verificaciones recientes</h2>
+              <p className="text-xs text-[var(--muted-foreground)] mt-0.5">{total} registros hoy</p>
             </div>
             {/* Filtros visuales */}
             <div className="flex items-center gap-1.5">
@@ -137,8 +136,8 @@ export default function AdminPage() {
                   key={f.label}
                   className={`rounded-full px-2.5 py-1 text-xs font-medium cursor-default ${
                     f.active
-                      ? "bg-gray-900 text-white"
-                      : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                      ? "bg-foreground text-background"
+                      : "shadow-[var(--shadow-border-light)] text-[var(--muted-foreground)] hover:bg-[var(--gray-50)]"
                   }`}
                 >
                   {f.label}
@@ -149,43 +148,43 @@ export default function AdminPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[640px]">
               <thead>
-                <tr className="border-b border-gray-100 bg-gray-50">
-                  <th scope="col" className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-widest text-gray-500">Solicitante</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-gray-500">Documento</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-gray-500">País</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-gray-500">Decisión</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-gray-500">Face score</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-gray-500">Confianza</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-gray-500">Alertas</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-gray-500">Fecha</th>
+                <tr className="border-b border-[var(--border)] bg-[var(--gray-50)]">
+                  <th scope="col" className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">Solicitante</th>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">Documento</th>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">País</th>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">Decisión</th>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">Face score</th>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">Confianza</th>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">Alertas</th>
+                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">Fecha</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-[var(--border)]">
                 {MOCK_RECORDS.map((record) => {
                   const style = DECISION_STYLES[record.decision];
                   return (
-                    <tr key={record.id} className="hover:bg-gray-50/50 transition-colors">
+                    <tr key={record.id} className="hover:bg-[var(--gray-50)] transition-colors">
                       <td className="px-5 py-3.5">
-                        <div className="font-medium text-gray-900">{record.name}</div>
-                        <div className="text-xs text-gray-400">{record.id}</div>
+                        <div className="font-medium text-foreground">{record.name}</div>
+                        <div className="text-xs text-[var(--muted-foreground)]">{record.id}</div>
                       </td>
-                      <td className="px-4 py-3.5 text-gray-600 font-mono text-xs">{record.document_id}</td>
+                      <td className="px-4 py-3.5 text-[var(--muted-foreground)] font-mono text-xs">{record.document_id}</td>
                       <td className="px-4 py-3.5">
-                        <span className="rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+                        <span className="rounded-[var(--radius-sm)] bg-[var(--gray-100)] px-2 py-0.5 text-xs font-medium text-[var(--muted-foreground)]">
                           {record.country}
                         </span>
                       </td>
                       <td className="px-4 py-3.5">
                         <div className="flex items-center gap-1.5">
                           <span className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />
-                          <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${style.badge}`}>
+                          <span className={`rounded-full px-2 py-0.5 text-xs font-semibold shadow-[var(--shadow-border-light)] ${style.badge}`}>
                             {style.label}
                           </span>
                         </div>
                       </td>
                       <td className="px-4 py-3.5">
                         <div className="flex items-center gap-2">
-                          <div className="h-1.5 w-16 rounded-full bg-gray-100 overflow-hidden">
+                          <div className="h-1.5 w-16 rounded-full bg-[var(--gray-100)] overflow-hidden">
                             <div
                               className={`h-full rounded-full ${
                                 record.face_score >= 0.8 ? "bg-green-400" : record.face_score >= 0.6 ? "bg-yellow-400" : "bg-red-400"
@@ -193,26 +192,26 @@ export default function AdminPage() {
                               style={{ width: `${record.face_score * 100}%` }}
                             />
                           </div>
-                          <span className="text-xs text-gray-500">{(record.face_score * 100).toFixed(0)}%</span>
+                          <span className="text-xs text-[var(--muted-foreground)]">{(record.face_score * 100).toFixed(0)}%</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3.5 text-xs text-gray-600 tabular-nums">
+                      <td className="px-4 py-3.5 text-xs text-[var(--muted-foreground)] tabular-nums">
                         {(record.confidence * 100).toFixed(0)}%
                       </td>
                       <td className="px-4 py-3.5">
                         <div className="flex gap-1 flex-wrap">
                           {record.sanctions && (
-                            <span className="rounded bg-red-100 px-1.5 py-0.5 text-xs font-medium text-red-700">Sanciones</span>
+                            <span className="rounded shadow-[var(--shadow-border-light)] px-1.5 py-0.5 text-xs font-medium bg-red-50 text-red-700">Sanciones</span>
                           )}
                           {record.pep && (
-                            <span className="rounded bg-orange-100 px-1.5 py-0.5 text-xs font-medium text-orange-700">PEP</span>
+                            <span className="rounded shadow-[var(--shadow-border-light)] px-1.5 py-0.5 text-xs font-medium bg-orange-50 text-orange-700">PEP</span>
                           )}
                           {!record.sanctions && !record.pep && (
-                            <span className="text-xs text-gray-400">—</span>
+                            <span className="text-xs text-[var(--muted-foreground)]">—</span>
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-3.5 text-xs text-gray-400 whitespace-nowrap">
+                      <td className="px-4 py-3.5 text-xs text-[var(--muted-foreground)] whitespace-nowrap">
                         {formatDate(record.created_at)}
                       </td>
                     </tr>
@@ -225,16 +224,16 @@ export default function AdminPage() {
 
         {/* Footer */}
         <footer className="flex flex-col items-center gap-1 pt-2">
-          <div className="flex items-center gap-2 text-xs text-gray-400">
-            <span className="font-medium text-gray-500">KYC Anti-Fraude</span>
-            <span className="h-3 w-px bg-gray-300" />
+          <div className="flex items-center gap-2 text-xs text-[var(--muted-foreground)]">
+            <span className="font-medium text-foreground">KYC Anti-Fraude</span>
+            <span className="h-3 w-px bg-[var(--border)]" />
             <span>Datos simulados · Portafolio técnico</span>
           </div>
           <a
             href="https://github.com/mdeasis27"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-gray-400 hover:text-gray-700 transition-colors font-mono"
+            className="text-xs text-[var(--muted-foreground)] hover:text-foreground transition-colors font-mono"
           >
             github.com/mdeasis27
           </a>
@@ -248,20 +247,20 @@ function MetricCard({
   label,
   value,
   sub,
-  color = "text-gray-900",
-  accent = "border-gray-200",
+  color = "text-foreground",
+  accentClass = "border-[var(--border)]",
 }: {
   label: string;
   value: number;
   sub?: string;
   color?: string;
-  accent?: string;
+  accentClass?: string;
 }) {
   return (
-    <div className={`bg-white rounded-xl border border-gray-100 border-l-4 ${accent} p-5`}>
-      <div className="text-xs text-gray-500 font-medium mb-2">{label}</div>
+    <div className={`bg-[var(--card)] rounded-[var(--radius-md)] shadow-[var(--shadow-card)] border-l-4 ${accentClass} p-5`}>
+      <div className="text-xs text-[var(--muted-foreground)] font-medium mb-2">{label}</div>
       <div className={`text-3xl font-bold tabular-nums ${color}`}>{value}</div>
-      {sub && <div className="text-xs text-gray-400 mt-1">{sub}</div>}
+      {sub && <div className="text-xs text-[var(--muted-foreground)] mt-1">{sub}</div>}
     </div>
   );
 }

@@ -1,0 +1,24 @@
+{
+  "kit": "brand",
+  "syncedAt": "2026-04-18T15:09:56.183Z",
+  "sourcePath": "C:\\Proyectos\\proyectos-portafolio\\portafolio-mdea\\design-system",
+  "files": [
+    ".brand-sync-manifest.json",
+    "CHANGELOG.md",
+    "README.md",
+    "components\\badge.tsx",
+    "components\\button.tsx",
+    "components\\card.tsx",
+    "components\\index.ts",
+    "components\\separator.tsx",
+    "components\\status-dot.tsx",
+    "fonts.ts",
+    "mdx\\callout.tsx",
+    "mdx\\metric-group.tsx",
+    "mdx\\metric.tsx",
+    "mdx\\tradeoff.tsx",
+    "tokens.css",
+    "tokens.ts",
+    "utils.ts"
+  ]
+}
