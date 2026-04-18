@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "../design-system/tokens.css";
 
+@custom-variant dark (&:is(.dark *));
+
 @theme inline {
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
@@ -19,6 +21,8 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-card:                 var(--card);
   --color-card-foreground:      var(--card-foreground);
+  --color-popover:              var(--popover);
+  --color-popover-foreground:   var(--popover-foreground);
   --color-input:                var(--input);
   --color-ring:                 var(--ring);
   --color-destructive:          var(--destructive);
@@ -36,16 +40,14 @@
 
 @layer base {
   * {
-    box-sizing: border-box;
+    @apply border-border outline-ring/50;
   }
   html {
-    font-family: var(--font-sans), system-ui, sans-serif;
+    @apply font-sans;
     font-feature-settings: "liga";
   }
   body {
-    background: var(--background);
-    color: var(--foreground);
-    -webkit-font-smoothing: antialiased;
+    @apply bg-background text-foreground font-sans antialiased;
   }
   h1 {
     letter-spacing: -2.4px;
@@ -55,6 +57,22 @@
   h2 {
     letter-spacing: -1.6px;
     line-height: 1.2;
+    font-weight: 600;
+  }
+  h3 {
+    letter-spacing: -1.28px;
+    line-height: 1.25;
+    font-weight: 600;
+  }
+  h4 {
+    letter-spacing: -0.96px;
+    line-height: 1.33;
+    font-weight: 600;
+  }
+  h5,
+  h6 {
+    letter-spacing: -0.32px;
+    line-height: 1.5;
     font-weight: 600;
   }
 }
