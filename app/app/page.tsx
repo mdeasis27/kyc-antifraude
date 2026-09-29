@@ -2,41 +2,47 @@
 
 import { useState, useRef, useEffect } from "react";
 import { OnboardingStepper } from "@/components/OnboardingStepper";
+import { Alert } from "@/design-system/components/alert";
+import { Meter } from "@/design-system/components/meter";
+import { StatusBadge } from "@/design-system/components/status-badge";
+import type { Tone } from "@/design-system/components/tone";
 import type { KycSynthesis } from "@/lib/synthesizer";
 import type { KycScenario } from "@/lib/truora";
 
-const SCENARIOS: { value: KycScenario; label: string; dot: string }[] = [
-  { value: "aprobado", label: "Aprobado", dot: "bg-emerald-400" },
-  { value: "revision_manual", label: "Revisión manual", dot: "bg-amber-400" },
-  { value: "rechazado", label: "Rechazado", dot: "bg-red-400" },
+const SCENARIOS: { value: KycScenario; label: string; dot: string; tone: Tone }[] = [
+  { value: "aprobado", label: "Aprobado", dot: "bg-success", tone: "success" },
+  { value: "revision_manual", label: "Revisión manual", dot: "bg-warning", tone: "warning" },
+  { value: "rechazado", label: "Rechazado", dot: "bg-danger", tone: "danger" },
 ];
 
-const DECISION_CONFIG = {
+const DECISION_CONFIG: Record<
+  KycSynthesis["decision"],
+  { tone: Tone; label: string; nextAction: string }
+> = {
   APROBADO: {
-    bg: "bg-emerald-50",
-    border: "border-emerald-200",
-    headerBg: "bg-emerald-500",
-    bar: "bg-emerald-400",
+    tone: "success",
     label: "APROBADO",
     nextAction: "Tu identidad ha sido verificada exitosamente. Puedes continuar con el proceso de onboarding.",
   },
   RECHAZADO: {
-    bg: "bg-red-50",
-    border: "border-red-200",
-    headerBg: "bg-red-600",
-    bar: "bg-red-400",
+    tone: "danger",
     label: "RECHAZADO",
     nextAction: "No fue posible completar la verificación. Contacta a soporte con tu número de caso.",
   },
   REVISION_MANUAL: {
-    bg: "bg-amber-50",
-    border: "border-amber-200",
-    headerBg: "bg-amber-500",
-    bar: "bg-amber-400",
+    tone: "warning",
     label: "REVISIÓN MANUAL",
     nextAction: "Un agente revisará tu caso en las próximas 24 horas hábiles. Te notificaremos por correo.",
   },
-} as const;
+};
+
+const SOLID: Record<Tone, string> = {
+  neutral: "bg-foreground text-background",
+  success: "bg-success text-background",
+  warning: "bg-warning text-background",
+  danger: "bg-danger text-background",
+  info: "bg-info text-background",
+};
 
 const LOADING_STEPS = [
   "Validando documento de identidad…",
@@ -178,7 +184,7 @@ export default function Home() {
               <path d="M10 2L3 5.5v5c0 4.5 3 7.5 7 8.5 4-1 7-4 7-8.5v-5L10 2z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
             </svg>
           </div>
-          <span className="font-bold text-sm tracking-tight text-foreground">KYC Shield</span>
+          <span className="font-semibold text-sm tracking-tight text-foreground">KYC Shield</span>
           <span className="rounded-full shadow-[var(--shadow-border-light)] px-2 py-0.5 text-xs text-[var(--muted-foreground)] font-medium">
             Demo
           </span>
@@ -193,7 +199,7 @@ export default function Home() {
 
       {/* Hero */}
       <section className="max-w-3xl mx-auto w-full px-6 pt-14 pb-8">
-        <h1 className="text-4xl font-bold text-foreground leading-tight mb-4">
+        <h1 className="text-4xl font-semibold text-foreground leading-tight mb-4">
           Verifica identidades<br />
           <span className="text-[var(--accent)]">con IA en segundos</span>
         </h1>
@@ -249,28 +255,25 @@ export default function Home() {
         <OnboardingStepper currentStep={step} />
 
         {/* Badge escenario activo en pasos 2 y 3 */}
-        {step > 1 && (
-          <div className="flex justify-end">
-            <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-              scenario === "aprobado" ? "bg-emerald-100 text-emerald-700" :
-              scenario === "rechazado" ? "bg-red-100 text-red-700" :
-              "bg-amber-100 text-amber-700"
-            }`}>
-              {scenario === "aprobado" ? "Escenario: Aprobado" : scenario === "rechazado" ? "Escenario: Rechazado" : "Escenario: Revisión manual"}
-            </span>
-          </div>
-        )}
+        {step > 1 && (() => {
+          const active = SCENARIOS.find((s) => s.value === scenario);
+          return (
+            <div className="flex justify-end">
+              <StatusBadge tone={active?.tone ?? "neutral"}>
+                Escenario: {active?.label}
+              </StatusBadge>
+            </div>
+          );
+        })()}
 
         {/* Error */}
         {error && (
-          <div
-            role="alert"
-            aria-live="polite"
-            className="rounded-[var(--radius-md)] bg-red-50 shadow-[var(--shadow-border-light)] p-4 flex items-start justify-between gap-3"
-          >
-            <p className="text-sm text-red-700">{error}</p>
-            <button onClick={() => setError(null)} aria-label="Cerrar error" className="text-red-300 hover:text-red-500 text-xl leading-none">×</button>
-          </div>
+          <Alert tone="danger" role="alert" aria-live="polite" className="p-4">
+            <div className="flex items-start justify-between gap-3">
+              <p className="text-sm text-foreground">{error}</p>
+              <button onClick={() => setError(null)} aria-label="Cerrar error" className="text-xl leading-none text-muted-foreground hover:text-foreground">×</button>
+            </div>
+          </Alert>
         )}
 
         {/* Card */}
@@ -310,10 +313,10 @@ export default function Home() {
                 </label>
 
                 {docPreview && (
-                  <div className="flex items-center gap-2 text-xs text-emerald-600 font-medium">
+                  <div className="flex items-center gap-2 text-xs text-success font-medium">
                     <svg className="h-3.5 w-3.5" viewBox="0 0 14 14" fill="none">
-                      <circle cx="7" cy="7" r="6" fill="#10b981"/>
-                      <path d="M4 7l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <circle cx="7" cy="7" r="6" fill="currentColor"/>
+                      <path d="M4 7l2 2 4-4" stroke="var(--background)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                     Imagen seleccionada
                   </div>
@@ -358,7 +361,7 @@ export default function Home() {
                           <div key={label} className="flex items-center gap-3">
                             <div className={`h-5 w-5 rounded-full shrink-0 flex items-center justify-center border transition-all ${
                               i < loadingStep
-                                ? "bg-emerald-500 border-emerald-500"
+                                ? "bg-success border-success"
                                 : i === loadingStep
                                 ? "border-foreground bg-background animate-pulse"
                                 : "border-[var(--border)] bg-background"
@@ -371,7 +374,7 @@ export default function Home() {
                               {i === loadingStep && <div className="h-2 w-2 rounded-full bg-foreground" />}
                             </div>
                             <span className={`text-xs transition-colors ${
-                              i < loadingStep ? "text-emerald-600 line-through" :
+                              i < loadingStep ? "text-success line-through" :
                               i === loadingStep ? "text-foreground font-medium" : "text-[var(--muted-foreground)]"
                             }`}>{label}</span>
                           </div>
@@ -407,10 +410,10 @@ export default function Home() {
                 )}
 
                 {selfiePreview && !loading && (
-                  <div className="flex items-center gap-2 text-xs text-emerald-600 font-medium">
+                  <div className="flex items-center gap-2 text-xs text-success font-medium">
                     <svg className="h-3.5 w-3.5" viewBox="0 0 14 14" fill="none">
-                      <circle cx="7" cy="7" r="6" fill="#10b981"/>
-                      <path d="M4 7l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <circle cx="7" cy="7" r="6" fill="currentColor"/>
+                      <path d="M4 7l2 2 4-4" stroke="var(--background)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                     Imagen seleccionada
                   </div>
@@ -440,38 +443,36 @@ export default function Home() {
             const confidencePct = Math.min(100, Math.max(0, synthesis.confidence * 100));
             return (
               <div className="step-panel">
-                <div className={`${cfg.headerBg} px-6 py-5 flex items-center gap-4`}>
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20 shrink-0">
+                <div className={`${SOLID[cfg.tone]} px-6 py-5 flex items-center gap-4`}>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-background/20 shrink-0">
                     {synthesis.decision === "APROBADO" && (
-                      <svg className="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none">
-                        <path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none">
+                        <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     )}
                     {synthesis.decision === "RECHAZADO" && (
-                      <svg className="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none">
-                        <path d="M6 6l12 12M18 6L6 18" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+                      <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none">
+                        <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
                       </svg>
                     )}
                     {synthesis.decision === "REVISION_MANUAL" && (
-                      <svg className="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 8v5m0 3h.01" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+                      <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 8v5m0 3h.01" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
                       </svg>
                     )}
                   </div>
                   <div>
-                    <div className="text-white font-bold text-lg tracking-wide">{cfg.label}</div>
-                    <div className="text-white/70 text-xs mt-0.5">Confianza: {confidencePct.toFixed(0)}%</div>
+                    <div className="font-semibold text-lg tracking-wide">{cfg.label}</div>
+                    <div className="text-xs mt-0.5 opacity-70">Confianza: {confidencePct.toFixed(0)}%</div>
                   </div>
                 </div>
 
-                <div className="h-1.5 bg-[var(--gray-100)]">
-                  <div className={`h-full ${cfg.bar} transition-all duration-700`} style={{ width: `${confidencePct}%` }} />
-                </div>
+                <Meter value={confidencePct} tone={cfg.tone} className="h-1.5 rounded-none" />
 
                 <div className="p-6 space-y-5">
-                  <div className={`rounded-[var(--radius-md)] border ${cfg.border} ${cfg.bg} p-4`}>
-                    <p className="text-sm text-gray-700 leading-relaxed">{synthesis.summary}</p>
-                  </div>
+                  <Alert tone={cfg.tone}>
+                    <p className="text-sm leading-relaxed text-foreground">{synthesis.summary}</p>
+                  </Alert>
 
                   <div className="rounded-[var(--radius-md)] shadow-[var(--shadow-border-light)] bg-[var(--gray-50)] p-4">
                     <p className="text-xs font-semibold text-[var(--muted-foreground)] mb-1">¿Qué sigue?</p>

@@ -1,5 +1,9 @@
 import Link from "next/link";
 
+import { MetricCard } from "@/design-system/components/metric-card";
+import { StatusBadge } from "@/design-system/components/status-badge";
+import type { Tone } from "@/design-system/components/tone";
+
 type Decision = "APROBADO" | "RECHAZADO" | "REVISION_MANUAL";
 
 interface VerificationRecord {
@@ -26,10 +30,10 @@ const MOCK_RECORDS: VerificationRecord[] = [
   { id: "chk_008", name: "Sebastián Díaz", document_id: "CC-1076543210", country: "CO", decision: "APROBADO", confidence: 0.96, created_at: "2025-04-15T11:58:00Z", face_score: 0.95, sanctions: false, pep: false },
 ];
 
-const DECISION_STYLES: Record<Decision, { badge: string; label: string; dot: string }> = {
-  APROBADO: { badge: "bg-green-100 text-green-800", label: "Aprobado", dot: "bg-green-500" },
-  RECHAZADO: { badge: "bg-red-100 text-red-800", label: "Rechazado", dot: "bg-red-500" },
-  REVISION_MANUAL: { badge: "bg-yellow-100 text-yellow-800", label: "Revisión manual", dot: "bg-yellow-500" },
+const DECISION_STYLES: Record<Decision, { label: string; tone: Tone }> = {
+  APROBADO: { label: "Aprobado", tone: "success" },
+  RECHAZADO: { label: "Rechazado", tone: "danger" },
+  REVISION_MANUAL: { label: "Revisión manual", tone: "warning" },
 };
 
 function formatDate(iso: string) {
@@ -81,10 +85,10 @@ export default function AdminPage() {
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
         {/* Métricas */}
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <MetricCard label="Total verificaciones" value={total} accentClass="border-[var(--border)]" />
-          <MetricCard label="Aprobados" value={aprobados} sub={`${((aprobados / total) * 100).toFixed(0)}% del total`} color="text-green-600" accentClass="border-green-400" />
-          <MetricCard label="Rechazados" value={rechazados} sub={`${((rechazados / total) * 100).toFixed(0)}% del total`} color="text-red-600" accentClass="border-red-400" />
-          <MetricCard label="Revisión manual" value={revision} sub={`${((revision / total) * 100).toFixed(0)}% del total`} color="text-amber-600" accentClass="border-amber-400" />
+          <MetricCard label="Total verificaciones" value={total} />
+          <MetricCard label="Aprobados" value={aprobados} hint={`${((aprobados / total) * 100).toFixed(0)}% del total`} tone="success" />
+          <MetricCard label="Rechazados" value={rechazados} hint={`${((rechazados / total) * 100).toFixed(0)}% del total`} tone="danger" />
+          <MetricCard label="Revisión manual" value={revision} hint={`${((revision / total) * 100).toFixed(0)}% del total`} tone="warning" />
         </div>
 
         {/* Barra de distribución */}
@@ -100,15 +104,15 @@ export default function AdminPage() {
             aria-label={`Distribución: ${aprobados} aprobados, ${revision} en revisión, ${rechazados} rechazados`}
             className="flex h-2.5 w-full rounded-full overflow-hidden gap-px"
           >
-            <div className="bg-green-400 transition-all" style={{ width: `${(aprobados / total) * 100}%` }} />
-            <div className="bg-yellow-400 transition-all" style={{ width: `${(revision / total) * 100}%` }} />
-            <div className="bg-red-400 transition-all" style={{ width: `${(rechazados / total) * 100}%` }} />
+            <div className="bg-success transition-all" style={{ width: `${(aprobados / total) * 100}%` }} />
+            <div className="bg-warning transition-all" style={{ width: `${(revision / total) * 100}%` }} />
+            <div className="bg-danger transition-all" style={{ width: `${(rechazados / total) * 100}%` }} />
           </div>
           <div className="flex items-center gap-4 mt-2.5">
             {[
-              { color: "bg-green-400", label: "Aprobado" },
-              { color: "bg-yellow-400", label: "Revisión" },
-              { color: "bg-red-400", label: "Rechazado" },
+              { color: "bg-success", label: "Aprobado" },
+              { color: "bg-warning", label: "Revisión" },
+              { color: "bg-danger", label: "Rechazado" },
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-1.5">
                 <span className={`h-2 w-2 rounded-full ${item.color}`} />
@@ -175,19 +179,16 @@ export default function AdminPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3.5">
-                        <div className="flex items-center gap-1.5">
-                          <span className={`h-1.5 w-1.5 rounded-full ${style.dot}`} />
-                          <span className={`rounded-full px-2 py-0.5 text-xs font-semibold shadow-[var(--shadow-border-light)] ${style.badge}`}>
-                            {style.label}
-                          </span>
-                        </div>
+                        <StatusBadge tone={style.tone} dot>
+                          {style.label}
+                        </StatusBadge>
                       </td>
                       <td className="px-4 py-3.5">
                         <div className="flex items-center gap-2">
                           <div className="h-1.5 w-16 rounded-full bg-[var(--gray-100)] overflow-hidden">
                             <div
                               className={`h-full rounded-full ${
-                                record.face_score >= 0.8 ? "bg-green-400" : record.face_score >= 0.6 ? "bg-yellow-400" : "bg-red-400"
+                                record.face_score >= 0.8 ? "bg-success" : record.face_score >= 0.6 ? "bg-warning" : "bg-danger"
                               }`}
                               style={{ width: `${record.face_score * 100}%` }}
                             />
@@ -201,10 +202,10 @@ export default function AdminPage() {
                       <td className="px-4 py-3.5">
                         <div className="flex gap-1 flex-wrap">
                           {record.sanctions && (
-                            <span className="rounded shadow-[var(--shadow-border-light)] px-1.5 py-0.5 text-xs font-medium bg-red-50 text-red-700">Sanciones</span>
+                            <StatusBadge tone="danger">Sanciones</StatusBadge>
                           )}
                           {record.pep && (
-                            <span className="rounded shadow-[var(--shadow-border-light)] px-1.5 py-0.5 text-xs font-medium bg-orange-50 text-orange-700">PEP</span>
+                            <StatusBadge tone="warning">PEP</StatusBadge>
                           )}
                           {!record.sanctions && !record.pep && (
                             <span className="text-xs text-[var(--muted-foreground)]">—</span>
@@ -243,24 +244,3 @@ export default function AdminPage() {
   );
 }
 
-function MetricCard({
-  label,
-  value,
-  sub,
-  color = "text-foreground",
-  accentClass = "border-[var(--border)]",
-}: {
-  label: string;
-  value: number;
-  sub?: string;
-  color?: string;
-  accentClass?: string;
-}) {
-  return (
-    <div className={`bg-[var(--card)] rounded-[var(--radius-md)] shadow-[var(--shadow-card)] border-l-4 ${accentClass} p-5`}>
-      <div className="text-xs text-[var(--muted-foreground)] font-medium mb-2">{label}</div>
-      <div className={`text-3xl font-bold tabular-nums ${color}`}>{value}</div>
-      {sub && <div className="text-xs text-[var(--muted-foreground)] mt-1">{sub}</div>}
-    </div>
-  );
-}
