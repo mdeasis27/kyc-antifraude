@@ -30,6 +30,23 @@ Defined in `tokens.css`; mirrored as TS constants in `tokens.ts`.
 | `--preview` | `#de1d8d` | Preview deployment step |
 | `--develop` | `#0a72ef` | Development step |
 
+### Semantic status tokens (v3.1+)
+
+The only sanctioned use of color in UI chrome. Theme-aware: light/dark values
+differ, so always use the token (never a raw hex). Tint surfaces at `/10`,
+use the solid token for text, dots and bars.
+
+| Token | Light | Dark | Use |
+|---|---|---|---|
+| `--success` | `#16a34a` | `#34d399` | Approve, low risk, positive |
+| `--warning` | `#d97706` | `#fbbf24` | Review, medium risk |
+| `--danger` | `#dc2626` | `#f87171` | Reject, high risk, error |
+| `--info` | `#0072f5` | `#60a5fa` | Neutral information |
+
+Mapped in `globals.css` as `--color-success` / `--color-warning` /
+`--color-danger` / `--color-info`, so Tailwind utilities `bg-success/10`,
+`text-danger`, `border-warning/25` are available in every project.
+
 ### Shadow tokens
 
 | Token | Value | Use |
@@ -60,10 +77,19 @@ Configured in `fonts.ts`:
 
 In `components/`:
 - `Button` — `default` / `outline` / `ghost` / `link`, sizes `default`/`sm`/`lg`/`icon`
-- `Badge` — `default` / `outline` / `status-shipped` / `status-beta` / `status-archived`
+- `Badge` — mono/technical label: `default` / `outline` / `status-shipped` / `status-beta` / `status-archived`
 - `Card` — container with `--radius-md` + `--shadow-card`
 - `Separator` — 1px border line
 - `StatusDot` — dot + label (`live`/`beta`/`archived`)
+- `StatusBadge` — semantic pill, `tone` = `neutral`/`success`/`warning`/`danger`/`info`, optional `dot`
+- `Alert` — tinted callout, `tone` + optional `title` / `items[]`
+- `MetricCard` — KPI tile, `label` / `value` / `hint` / `tone`
+- `Meter` — horizontal bar, `value` / `max` / `tone`
+- `Stepper` — horizontal step indicator, `steps[]` + 1-based `current`
+
+`Tone` (`neutral` | `success` | `warning` | `danger` | `info`) is the shared
+vocabulary; status is expressed with these components, never with raw
+`green-500` / `amber-500` / `red-500` classes.
 
 ## MDX-only components (hub-exclusive)
 

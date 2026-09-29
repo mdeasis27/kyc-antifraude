@@ -1,5 +1,11 @@
 # Design System Changelog
 
+## 3.1.0 — 2026-09-28
+
+- New **semantic status tokens**: `--success`, `--warning`, `--danger`, `--info` (theme-aware light/dark). Mapped as `--color-*` in `globals.css`.
+- New portable components: `StatusBadge`, `Alert`, `MetricCard`, `Meter`, `Stepper`; shared `Tone` type (`neutral`/`success`/`warning`/`danger`/`info`).
+- Rationale: unify the 5 portfolio demos, which had each invented their own green/amber/red palette. Status is now expressed only through tokens + these components.
+
 ## 3.0.0 — 2026-04-17
 
 - **Breaking:** fonts replaced Inter + Fraunces + JetBrains Mono → **Geist** + **Geist Mono** (Next.js font/google). `fontSerif` export removed; `fontVariables` now covers only sans + mono.

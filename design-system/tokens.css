@@ -1,5 +1,5 @@
 /* design-system/tokens.css
- * MDEA brand tokens — v3.0.0 (Vercel/Geist)
+ * MDEA brand tokens — v3.1.0 (Vercel/Geist + semantic status layer)
  * Source of truth for CSS variables.
  * Imported by src/app/globals.css. Copied to sibling projects via brand:sync.
  */
@@ -28,6 +28,14 @@
   --ship:    #ff5b4f;
   --preview: #de1d8d;
   --develop: #0a72ef;
+
+  /* Semantic status colors — the ONLY sanctioned use of color in UI chrome.
+   * Use tinted surfaces (10% opacity) for backgrounds, the solid token for
+   * text, dots and bars. Never introduce ad-hoc greens/ambers/reds in components. */
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger:  #dc2626;
+  --info:    #0072f5;
 
   /* Shadow tokens — shadow-as-border */
   --shadow-border:       0 0 0 1px rgba(0,0,0,0.08);
@@ -75,6 +83,11 @@
   --ship:    #ff5b4f;
   --preview: #de1d8d;
   --develop: #0a72ef;
+
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger:  #f87171;
+  --info:    #60a5fa;
 
   --shadow-border:       0 0 0 1px rgba(255,255,255,0.1);
   --shadow-border-light: 0 0 0 1px #2e2e2e;

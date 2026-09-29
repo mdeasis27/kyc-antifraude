@@ -27,6 +27,12 @@
   --color-ring:                 var(--ring);
   --color-destructive:          var(--destructive);
 
+  /* Semantic status colors */
+  --color-success:              var(--success);
+  --color-warning:              var(--warning);
+  --color-danger:               var(--danger);
+  --color-info:                 var(--info);
+
   --radius-sm:   var(--radius-sm);
   --radius:      var(--radius);
   --radius-md:   var(--radius-md);
@@ -55,7 +61,7 @@
     font-weight: 600;
   }
   h2 {
-    letter-spacing: -1.6px;
+    letter-spacing: -2.4px;
     line-height: 1.2;
     font-weight: 600;
   }

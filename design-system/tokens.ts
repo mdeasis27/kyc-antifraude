@@ -1,5 +1,5 @@
 // design-system/tokens.ts
-// Source of truth for the MDEA brand palette — v3.0.0 (Vercel/Geist).
+// Source of truth for the MDEA brand palette — v3.1.0 (Vercel/Geist + semantic status layer).
 // CSS variables live in tokens.css; this file mirrors them for TS consumption.
 
 export const brand = {
@@ -15,6 +15,10 @@ export const brand = {
   ship:        "#ff5b4f",
   preview:     "#de1d8d",
   develop:     "#0a72ef",
+  success:     { light: "#16a34a", dark: "#34d399" },
+  warning:     { light: "#d97706", dark: "#fbbf24" },
+  danger:      { light: "#dc2626", dark: "#f87171" },
+  info:        { light: "#0072f5", dark: "#60a5fa" },
 } as const;
 
 export const shadows = {
