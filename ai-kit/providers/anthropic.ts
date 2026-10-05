@@ -6,6 +6,9 @@ import type { ChatOptions, ChatResponse } from "../types";
 import { ProviderError } from "../errors";
 
 const DEFAULT_MODEL = "claude-haiku-4-5-20251001";
+type AnthropicResponse = { content: Array<{ type: string; text?: string }>; model?: string };
+type AnthropicClient = { messages: { create(input: { model: string; max_tokens: number; system?: string; messages: Array<{ role: "user" | "assistant"; content: string }> }): Promise<AnthropicResponse> } };
+type AnthropicConstructor = new (options: { apiKey: string }) => AnthropicClient;
 
 export function createAnthropicProvider(apiKey: string): LLMProvider {
   return {
@@ -20,19 +23,18 @@ export function createAnthropicProvider(apiKey: string): LLMProvider {
       const start = Date.now();
 
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        // webpackIgnore: package only needed at runtime (BYOK); not bundled by Turbopack
-        const { default: Anthropic } = await import(/* webpackIgnore: true */ "@anthropic-ai/sdk" as any);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const client: any = new Anthropic({ apiKey });
+        // A variable module name keeps this optional SDK out of consumer dependency graphs.
+        const moduleName = "@anthropic-ai/sdk";
+        const { default: imported } = await import(/* webpackIgnore: true */ moduleName);
+        const Anthropic = imported as unknown as AnthropicConstructor;
+        const client = new Anthropic({ apiKey });
 
         const systemMsg = opts.messages.find((m) => m.role === "system")?.content;
         const messages = opts.messages
           .filter((m) => m.role !== "system")
           .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const response: any = await client.messages.create({
+        const response = await client.messages.create({
           model: DEFAULT_MODEL,
           max_tokens: opts.maxTokens ?? 1024,
           system: systemMsg,
@@ -40,7 +42,7 @@ export function createAnthropicProvider(apiKey: string): LLMProvider {
         });
 
         const text: string =
-          response.content?.find((b: { type: string }) => b.type === "text")?.text ?? "";
+          response.content.find((block) => block.type === "text")?.text ?? "";
 
         return {
           text,

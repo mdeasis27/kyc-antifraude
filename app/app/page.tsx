@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 import { OnboardingStepper } from "@/components/OnboardingStepper";
 import { Alert } from "@/design-system/components/alert";
 import { Meter } from "@/design-system/components/meter";
@@ -189,12 +190,12 @@ export default function Home() {
             Demo
           </span>
         </div>
-        <a
+        <Link
           href="/admin"
           className="text-xs text-[var(--muted-foreground)] hover:text-foreground transition-colors"
         >
           Panel de administración →
-        </a>
+        </Link>
       </header>
 
       {/* Hero */}
@@ -516,12 +517,12 @@ export default function Home() {
                     >
                       Nueva verificación
                     </button>
-                    <a
+                    <Link
                       href="/admin"
                       className="flex-1 rounded-[var(--radius-md)] bg-[var(--primary)] px-4 py-3 text-sm font-semibold text-white hover:bg-[var(--primary)]/90 transition-colors text-center"
                     >
                       Ver en admin →
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>

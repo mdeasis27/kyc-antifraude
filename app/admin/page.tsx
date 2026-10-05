@@ -4,243 +4,85 @@ import { MetricCard } from "@/design-system/components/metric-card";
 import { StatusBadge } from "@/design-system/components/status-badge";
 import type { Tone } from "@/design-system/components/tone";
 
-type Decision = "APROBADO" | "RECHAZADO" | "REVISION_MANUAL";
+type Locale = "en" | "es";
+type Decision = "approved" | "rejected" | "manual_review";
 
 interface VerificationRecord {
   id: string;
-  name: string;
-  document_id: string;
+  applicant: string;
+  documentId: string;
   country: string;
   decision: Decision;
-  confidence: number;
-  created_at: string;
-  face_score: number;
+  reviewSignal: number;
+  createdAt: string;
+  matchSignal: number;
   sanctions: boolean;
   pep: boolean;
 }
 
-const MOCK_RECORDS: VerificationRecord[] = [
-  { id: "chk_001", name: "Ana Martínez", document_id: "CC-1098765432", country: "CO", decision: "APROBADO", confidence: 0.97, created_at: "2025-04-15T09:12:00Z", face_score: 0.96, sanctions: false, pep: false },
-  { id: "chk_002", name: "Jorge Rodríguez", document_id: "CC-1054321987", country: "CO", decision: "RECHAZADO", confidence: 0.91, created_at: "2025-04-15T09:35:00Z", face_score: 0.28, sanctions: true, pep: false },
-  { id: "chk_003", name: "María López", document_id: "PA-AB123456", country: "MX", decision: "REVISION_MANUAL", confidence: 0.68, created_at: "2025-04-15T10:04:00Z", face_score: 0.61, sanctions: false, pep: true },
-  { id: "chk_004", name: "Carlos Herrera", document_id: "CC-1123456789", country: "CO", decision: "APROBADO", confidence: 0.94, created_at: "2025-04-15T10:22:00Z", face_score: 0.93, sanctions: false, pep: false },
-  { id: "chk_005", name: "Luisa Fernández", document_id: "CE-987654321", country: "VE", decision: "RECHAZADO", confidence: 0.88, created_at: "2025-04-15T10:48:00Z", face_score: 0.34, sanctions: true, pep: true },
-  { id: "chk_006", name: "Andrés Torres", document_id: "CC-1098123456", country: "CO", decision: "APROBADO", confidence: 0.99, created_at: "2025-04-15T11:05:00Z", face_score: 0.98, sanctions: false, pep: false },
-  { id: "chk_007", name: "Valentina Gómez", document_id: "PA-CD789012", country: "AR", decision: "REVISION_MANUAL", confidence: 0.72, created_at: "2025-04-15T11:31:00Z", face_score: 0.65, sanctions: false, pep: true },
-  { id: "chk_008", name: "Sebastián Díaz", document_id: "CC-1076543210", country: "CO", decision: "APROBADO", confidence: 0.96, created_at: "2025-04-15T11:58:00Z", face_score: 0.95, sanctions: false, pep: false },
+const RECORDS: VerificationRecord[] = [
+  { id: "sample-001", applicant: "Applicant A", documentId: "DOC-1001", country: "CO", decision: "approved", reviewSignal: 97, createdAt: "2025-04-15T09:12:00Z", matchSignal: 96, sanctions: false, pep: false },
+  { id: "sample-002", applicant: "Applicant B", documentId: "DOC-1002", country: "CO", decision: "rejected", reviewSignal: 91, createdAt: "2025-04-15T09:35:00Z", matchSignal: 28, sanctions: true, pep: false },
+  { id: "sample-003", applicant: "Applicant C", documentId: "DOC-1003", country: "MX", decision: "manual_review", reviewSignal: 68, createdAt: "2025-04-15T10:04:00Z", matchSignal: 61, sanctions: false, pep: true },
+  { id: "sample-004", applicant: "Applicant D", documentId: "DOC-1004", country: "CO", decision: "approved", reviewSignal: 94, createdAt: "2025-04-15T10:22:00Z", matchSignal: 93, sanctions: false, pep: false },
+  { id: "sample-005", applicant: "Applicant E", documentId: "DOC-1005", country: "VE", decision: "rejected", reviewSignal: 88, createdAt: "2025-04-15T10:48:00Z", matchSignal: 34, sanctions: true, pep: true },
+  { id: "sample-006", applicant: "Applicant F", documentId: "DOC-1006", country: "CO", decision: "approved", reviewSignal: 99, createdAt: "2025-04-15T11:05:00Z", matchSignal: 98, sanctions: false, pep: false },
+  { id: "sample-007", applicant: "Applicant G", documentId: "DOC-1007", country: "AR", decision: "manual_review", reviewSignal: 72, createdAt: "2025-04-15T11:31:00Z", matchSignal: 65, sanctions: false, pep: true },
+  { id: "sample-008", applicant: "Applicant H", documentId: "DOC-1008", country: "CO", decision: "approved", reviewSignal: 96, createdAt: "2025-04-15T11:58:00Z", matchSignal: 95, sanctions: false, pep: false },
 ];
 
-const DECISION_STYLES: Record<Decision, { label: string; tone: Tone }> = {
-  APROBADO: { label: "Aprobado", tone: "success" },
-  RECHAZADO: { label: "Rechazado", tone: "danger" },
-  REVISION_MANUAL: { label: "Revisión manual", tone: "warning" },
-};
+const decisionTone: Record<Decision, Tone> = { approved: "success", rejected: "danger", manual_review: "warning" };
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleString("es-CO", {
-    day: "2-digit",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+function copy(lang: Locale) {
+  return lang === "es" ? {
+    title: "Panel de verificación", subtitle: "Resumen estático de registros ficticios", newCase: "Nueva verificación", sample: "Datos ficticios", notice: "Los registros, identificadores y señales mostrados son ficticios. Las señales no son probabilidades calibradas y no sustituyen una decisión humana.",
+    total: "Registros de muestra", approved: "Aprobados", rejected: "Rechazados", review: "Revisión manual", distribution: "Distribución de decisiones", staticSummary: "Resumen estático · sin filtros interactivos", table: "Registros de muestra", dated: "Muestra fechada el 15 abr 2025", applicant: "Solicitante", document: "Documento", country: "País", decision: "Decisión", match: "Señal de coincidencia", signal: "Señal de revisión", alerts: "Alertas", date: "Fecha", sanctions: "Sanciones", scoreNote: "Señal ilustrativa; no es probabilidad calibrada.",
+    labels: { approved: "Aprobado", rejected: "Rechazado", manual_review: "Revisión manual" },
+  } : {
+    title: "Verification console", subtitle: "Static summary of fictional records", newCase: "New verification", sample: "Fictional data", notice: "The records, identifiers, and signals shown here are fictional. Signals are not calibrated probabilities and do not replace a human decision.",
+    total: "Sample records", approved: "Approved", rejected: "Rejected", review: "Manual review", distribution: "Decision distribution", staticSummary: "Static summary · no interactive filters", table: "Sample records", dated: "Sample dated Apr 15, 2025", applicant: "Applicant", document: "Document", country: "Country", decision: "Decision", match: "Match signal", signal: "Review signal", alerts: "Alerts", date: "Date", sanctions: "Sanctions", scoreNote: "Illustrative signal; not a calibrated probability.",
+    labels: { approved: "Approved", rejected: "Rejected", manual_review: "Manual review" },
+  };
 }
 
-const total = MOCK_RECORDS.length;
-const aprobados = MOCK_RECORDS.filter((r) => r.decision === "APROBADO").length;
-const rechazados = MOCK_RECORDS.filter((r) => r.decision === "RECHAZADO").length;
-const revision = MOCK_RECORDS.filter((r) => r.decision === "REVISION_MANUAL").length;
-const avgConfidence = MOCK_RECORDS.reduce((acc, r) => acc + r.confidence, 0) / total;
-
-export default function AdminPage() {
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      {/* Topbar */}
-      <header className="bg-background border-b shadow-[var(--shadow-border-light)] px-4 sm:px-6 py-0 h-14 flex items-center justify-between gap-3 flex-wrap">
-        <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] shadow-[var(--shadow-card)] shrink-0">
-            <svg className="h-4 w-4 text-foreground" viewBox="0 0 16 16" fill="none">
-              <path d="M8 1.5L2 4v4c0 3.5 2.5 5.8 6 6.5 3.5-.7 6-3 6-6.5V4L8 1.5z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/>
-            </svg>
-          </div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-sm font-semibold text-foreground tracking-tight">Panel KYC</h1>
-            <span className="h-4 w-px bg-[var(--border)]" />
-            <p className="text-xs text-[var(--muted-foreground)] hidden sm:block">Administración de verificaciones</p>
-          </div>
-          <span className="rounded-full shadow-[var(--shadow-border-light)] px-2 py-0.5 text-xs text-[var(--muted-foreground)]">
-            Datos simulados
-          </span>
-        </div>
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 rounded-[var(--radius-md)] shadow-[var(--shadow-border-light)] px-3 py-1.5 text-xs font-medium text-[var(--muted-foreground)] hover:text-foreground hover:bg-[var(--gray-50)] transition-all"
-        >
-          <svg className="h-3 w-3" viewBox="0 0 12 12" fill="none">
-            <path d="M7.5 2L3 6l4.5 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          Nueva verificación
-        </Link>
-      </header>
-
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-        {/* Métricas */}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <MetricCard label="Total verificaciones" value={total} />
-          <MetricCard label="Aprobados" value={aprobados} hint={`${((aprobados / total) * 100).toFixed(0)}% del total`} tone="success" />
-          <MetricCard label="Rechazados" value={rechazados} hint={`${((rechazados / total) * 100).toFixed(0)}% del total`} tone="danger" />
-          <MetricCard label="Revisión manual" value={revision} hint={`${((revision / total) * 100).toFixed(0)}% del total`} tone="warning" />
-        </div>
-
-        {/* Barra de distribución */}
-        <div className="bg-[var(--card)] rounded-[var(--radius-lg)] shadow-[var(--shadow-card)] p-5">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-foreground">Distribución de decisiones</h2>
-            <span className="text-xs text-[var(--muted-foreground)]">
-              Confianza promedio: {(avgConfidence * 100).toFixed(0)}%
-            </span>
-          </div>
-          <div
-            role="img"
-            aria-label={`Distribución: ${aprobados} aprobados, ${revision} en revisión, ${rechazados} rechazados`}
-            className="flex h-2.5 w-full rounded-full overflow-hidden gap-px"
-          >
-            <div className="bg-success transition-all" style={{ width: `${(aprobados / total) * 100}%` }} />
-            <div className="bg-warning transition-all" style={{ width: `${(revision / total) * 100}%` }} />
-            <div className="bg-danger transition-all" style={{ width: `${(rechazados / total) * 100}%` }} />
-          </div>
-          <div className="flex items-center gap-4 mt-2.5">
-            {[
-              { color: "bg-success", label: "Aprobado" },
-              { color: "bg-warning", label: "Revisión" },
-              { color: "bg-danger", label: "Rechazado" },
-            ].map((item) => (
-              <div key={item.label} className="flex items-center gap-1.5">
-                <span className={`h-2 w-2 rounded-full ${item.color}`} />
-                <span className="text-xs text-[var(--muted-foreground)]">{item.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Tabla de verificaciones */}
-        <div className="bg-[var(--card)] rounded-[var(--radius-lg)] shadow-[var(--shadow-card)] overflow-hidden">
-          <div className="px-5 py-4 border-b border-[var(--border)] flex items-center justify-between flex-wrap gap-3">
-            <div>
-              <h2 className="text-sm font-semibold text-foreground">Verificaciones recientes</h2>
-              <p className="text-xs text-[var(--muted-foreground)] mt-0.5">{total} registros hoy</p>
-            </div>
-            {/* Filtros visuales */}
-            <div className="flex items-center gap-1.5">
-              {[
-                { label: "Todos", active: true },
-                { label: "Revisión pendiente", active: false },
-                { label: "Rechazados", active: false },
-              ].map((f) => (
-                <span
-                  key={f.label}
-                  className={`rounded-full px-2.5 py-1 text-xs font-medium cursor-default ${
-                    f.active
-                      ? "bg-foreground text-background"
-                      : "shadow-[var(--shadow-border-light)] text-[var(--muted-foreground)] hover:bg-[var(--gray-50)]"
-                  }`}
-                >
-                  {f.label}
-                </span>
-              ))}
-            </div>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm min-w-[640px]">
-              <thead>
-                <tr className="border-b border-[var(--border)] bg-[var(--gray-50)]">
-                  <th scope="col" className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">Solicitante</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">Documento</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">País</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">Decisión</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">Face score</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">Confianza</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">Alertas</th>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">Fecha</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--border)]">
-                {MOCK_RECORDS.map((record) => {
-                  const style = DECISION_STYLES[record.decision];
-                  return (
-                    <tr key={record.id} className="hover:bg-[var(--gray-50)] transition-colors">
-                      <td className="px-5 py-3.5">
-                        <div className="font-medium text-foreground">{record.name}</div>
-                        <div className="text-xs text-[var(--muted-foreground)]">{record.id}</div>
-                      </td>
-                      <td className="px-4 py-3.5 text-[var(--muted-foreground)] font-mono text-xs">{record.document_id}</td>
-                      <td className="px-4 py-3.5">
-                        <span className="rounded-[var(--radius-sm)] bg-[var(--gray-100)] px-2 py-0.5 text-xs font-medium text-[var(--muted-foreground)]">
-                          {record.country}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <StatusBadge tone={style.tone} dot>
-                          {style.label}
-                        </StatusBadge>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <div className="flex items-center gap-2">
-                          <div className="h-1.5 w-16 rounded-full bg-[var(--gray-100)] overflow-hidden">
-                            <div
-                              className={`h-full rounded-full ${
-                                record.face_score >= 0.8 ? "bg-success" : record.face_score >= 0.6 ? "bg-warning" : "bg-danger"
-                              }`}
-                              style={{ width: `${record.face_score * 100}%` }}
-                            />
-                          </div>
-                          <span className="text-xs text-[var(--muted-foreground)]">{(record.face_score * 100).toFixed(0)}%</span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3.5 text-xs text-[var(--muted-foreground)] tabular-nums">
-                        {(record.confidence * 100).toFixed(0)}%
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <div className="flex gap-1 flex-wrap">
-                          {record.sanctions && (
-                            <StatusBadge tone="danger">Sanciones</StatusBadge>
-                          )}
-                          {record.pep && (
-                            <StatusBadge tone="warning">PEP</StatusBadge>
-                          )}
-                          {!record.sanctions && !record.pep && (
-                            <span className="text-xs text-[var(--muted-foreground)]">—</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3.5 text-xs text-[var(--muted-foreground)] whitespace-nowrap">
-                        {formatDate(record.created_at)}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <footer className="flex flex-col items-center gap-1 pt-2">
-          <div className="flex items-center gap-2 text-xs text-[var(--muted-foreground)]">
-            <span className="font-medium text-foreground">KYC Anti-Fraude</span>
-            <span className="h-3 w-px bg-[var(--border)]" />
-            <span>Datos simulados · Portafolio técnico</span>
-          </div>
-          <a
-            href="https://github.com/mdeasis27"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-[var(--muted-foreground)] hover:text-foreground transition-colors font-mono"
-          >
-            github.com/mdeasis27
-          </a>
-        </footer>
-      </main>
-    </div>
-  );
+function formatDate(value: string, lang: Locale) {
+  return new Intl.DateTimeFormat(lang === "es" ? "es-MX" : "en-US", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(value));
 }
 
+export default function AdminPage({ lang = "es" }: { lang?: Locale }) {
+  const text = copy(lang);
+  const total = RECORDS.length;
+  const count = (decision: Decision) => RECORDS.filter((record) => record.decision === decision).length;
+
+  return <main className="mx-auto min-h-screen max-w-6xl px-5 py-10 text-foreground">
+    <header className="flex flex-wrap items-center justify-between gap-4 border-b pb-5">
+      <div>
+        <div className="flex flex-wrap items-center gap-3"><h1 className="text-2xl font-semibold">{text.title}</h1><StatusBadge tone="neutral">{text.sample}</StatusBadge></div>
+        <p className="mt-1 text-sm text-muted-foreground">{text.subtitle}</p>
+      </div>
+      <Link href={`/${lang}/app`} className="rounded border px-3 py-2 text-sm">← {text.newCase}</Link>
+    </header>
+
+    <p className="mt-6 rounded-lg border border-warning/30 bg-warning/10 p-4 text-sm text-muted-foreground">{text.notice}</p>
+
+    <section className="mt-6 grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 sm:grid-cols-4">
+      <MetricCard label={text.total} value={total} />
+      <MetricCard label={text.approved} value={count("approved")} tone="success" />
+      <MetricCard label={text.rejected} value={count("rejected")} tone="danger" />
+      <MetricCard label={text.review} value={count("manual_review")} tone="warning" />
+    </section>
+
+    <section className="mt-6 rounded-xl border bg-card p-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-2"><h2 className="font-semibold">{text.distribution}</h2><span className="text-xs text-muted-foreground">{text.staticSummary}</span></div>
+      <div className="mt-4 flex h-3 overflow-hidden rounded-full bg-muted" aria-label={text.distribution} role="img">
+        {(["approved", "manual_review", "rejected"] as Decision[]).map((decision) => <div key={decision} className={decision === "approved" ? "bg-success" : decision === "manual_review" ? "bg-warning" : "bg-danger"} style={{ width: `${(count(decision) / total) * 100}%` }} />)}
+      </div>
+      <p className="mt-3 text-xs text-muted-foreground">{text.scoreNote}</p>
+    </section>
+
+    <section className="mt-6 overflow-hidden rounded-xl border bg-card">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 border-b px-5 py-4"><h2 className="font-semibold">{text.table}</h2><p className="text-xs text-muted-foreground">{text.dated}</p></div>
+      <div className="overflow-x-auto"><table className="min-w-[900px] w-full text-sm"><thead className="bg-muted/40 text-left text-xs uppercase text-muted-foreground"><tr>{[text.applicant, text.document, text.country, text.decision, text.match, text.signal, text.alerts, text.date].map((heading) => <th key={heading} className="px-4 py-3 font-medium">{heading}</th>)}</tr></thead><tbody>{RECORDS.map((record) => <tr key={record.id} className="border-t"><td className="px-4 py-3"><p className="font-medium">{record.applicant}</p><p className="font-mono text-xs text-muted-foreground">{record.id}</p></td><td className="px-4 py-3 font-mono text-xs">{record.documentId}</td><td className="px-4 py-3">{record.country}</td><td className="px-4 py-3"><StatusBadge tone={decisionTone[record.decision]}>{text.labels[record.decision]}</StatusBadge></td><td className="px-4 py-3 tabular-nums">{record.matchSignal}</td><td className="px-4 py-3 tabular-nums">{record.reviewSignal}</td><td className="px-4 py-3 text-xs">{record.sanctions ? text.sanctions : record.pep ? "PEP" : "—"}</td><td className="px-4 py-3 whitespace-nowrap text-xs text-muted-foreground">{formatDate(record.createdAt, lang)}</td></tr>)}</tbody></table></div>
+    </section>
+  </main>;
+}

@@ -1,0 +1,4 @@
+{
+  "exit": 0,
+  "command": "pnpm install --frozen-lockfile"
+}

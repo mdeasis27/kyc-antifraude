@@ -1,0 +1,50 @@
+{
+  "repository": "kyc-antifraude",
+  "checks": [
+    {
+      "locale": "en",
+      "htmlLang": "en",
+      "buttons": [
+        "Check scenario",
+        "Cancel",
+        "Reset",
+        "Play",
+        "Show all"
+      ],
+      "inputs": 3,
+      "clicked": "Check scenario",
+      "traceEvents": 2,
+      "keyboardFocus": "SELECT",
+      "editingInvalidatesEvidence": true,
+      "resetClearsResult": true,
+      "cancelUsable": true,
+      "languageSwitchWithoutStorage": true
+    },
+    {
+      "locale": "es",
+      "htmlLang": "es",
+      "buttons": [
+        "Revisar escenario",
+        "Cancelar",
+        "Restablecer",
+        "Reproducir",
+        "Ver todo"
+      ],
+      "inputs": 3,
+      "clicked": "Revisar escenario",
+      "traceEvents": 2,
+      "keyboardFocus": "SELECT",
+      "editingInvalidatesEvidence": true,
+      "resetClearsResult": true,
+      "cancelUsable": true,
+      "languageSwitchWithoutStorage": true
+    }
+  ],
+  "errors": [],
+  "legacyRedirectRetainsQuery": true,
+  "unsupportedLocale404": true,
+  "translatedBodyDiffers": true,
+  "reducedMotionDisablesPlayback": true,
+  "mobileNoOverflow": true,
+  "noExternalOrApiRequests": true
+}

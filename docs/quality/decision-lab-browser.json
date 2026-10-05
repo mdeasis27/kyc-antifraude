@@ -1,0 +1,51 @@
+{
+  "repository": "kyc-antifraude",
+  "scope": "Real React component with controlled locale; Next routes not tested.",
+  "checks": [
+    {
+      "locale": "en",
+      "scenarios": [
+        {
+          "preset": "Clean document\nThe route proceeds.",
+          "outcome": "Proceed\n\nComplete clean fictional scenario may proceed."
+        },
+        {
+          "preset": "Flag detected\nScreening stops the route.",
+          "outcome": "Reject\n\nA local screening flag rejects the scenario and records a human-review reason."
+        }
+      ],
+      "mobileNoOverflow": true,
+      "reducedMotion": true,
+      "keyboard": true,
+      "noRequests": true,
+      "sceneChangesWithScenario": true,
+      "editingClearsPresetAndTrace": true,
+      "resetRestoresFirstPreset": true,
+      "cancelControlPresent": true,
+      "presetRestoresAllInputs": true
+    },
+    {
+      "locale": "es",
+      "scenarios": [
+        {
+          "preset": "Documento limpio\nLa ruta continúa.",
+          "outcome": "Continuar\n\nLa ruta se calcula con señales locales ficticias."
+        },
+        {
+          "preset": "Señal detectada\nEl screening detiene la ruta.",
+          "outcome": "Rechazar\n\nLa ruta se calcula con señales locales ficticias."
+        }
+      ],
+      "mobileNoOverflow": true,
+      "reducedMotion": true,
+      "keyboard": true,
+      "noRequests": true,
+      "sceneChangesWithScenario": true,
+      "editingClearsPresetAndTrace": true,
+      "resetRestoresFirstPreset": true,
+      "cancelControlPresent": true,
+      "presetRestoresAllInputs": true
+    }
+  ],
+  "errors": []
+}

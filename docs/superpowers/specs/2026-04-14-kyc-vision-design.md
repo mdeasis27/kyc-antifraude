@@ -2,18 +2,18 @@
 
 **Fecha:** 2026-04-14  
 **Objetivo:** Portafolio técnico para posibles empleadores  
-**Stack:** Next.js 16, React 19, Tailwind v4, Anthropic claude-sonnet-4-6, Supabase
+**Stack:** Next.js 16, React 19, Tailwind v4, Provider B claude-sonnet-4-6, Supabase
 
 ---
 
 ## Contexto
 
-El proyecto kyc-antifraude ya tiene un wizard KYC de 3 pasos con UI completa (Tailwind v4), rutas API básicas y una integración simulada de Truora. El objetivo de este rediseño es convertirlo en un demo funcional real que demuestre:
+El proyecto kyc-antifraude ya tiene un wizard KYC de 3 pasos con UI completa (Tailwind v4), rutas API básicas y una integración simulada de Identity verification API. El objetivo de este rediseño es convertirlo en un demo funcional real que demuestre:
 
 - Análisis multimodal con IA (Claude Vision)
 - Integración de base de datos (Supabase)
 - Arquitectura limpia en Next.js 16 App Router
-- Deployment en Vercel con URL pública
+- Deployment en deployment platform con URL pública
 
 ---
 
@@ -45,7 +45,7 @@ Next.js 16 (App Router)
         └── Lista checks para el dashboard (orden: created_at DESC)
 
 Servicios externos:
-  ├── Anthropic API (claude-sonnet-4-6) — análisis visual real
+  ├── Provider B API (claude-sonnet-4-6) — análisis visual real
   └── Supabase — PostgreSQL + Storage
 ```
 
@@ -246,15 +246,15 @@ npm install @ai-sdk/anthropic @supabase/supabase-js
 
 | Servicio   | Plan     | Costo       |
 |------------|----------|-------------|
-| Anthropic  | Pay-as-go| ~$0.003/check |
+| Provider B  | Pay-as-go| ~$0.003/check |
 | Supabase   | Free     | $0          |
-| Vercel     | Free     | $0          |
+| deployment platform     | Free     | $0          |
 
 ---
 
 ## Resultado final
 
-URL pública en Vercel donde un empleador puede:
+URL pública en deployment platform donde un empleador puede:
 1. Abrir la app sin registro
 2. Subir una foto de su cédula/pasaporte
 3. Ver cómo Claude extrae los datos en tiempo real
@@ -262,4 +262,4 @@ URL pública en Vercel donde un empleador puede:
 5. Obtener una decisión KYC con explicación de la IA
 6. Ver el dashboard con todos los checks históricos
 
-**Stack demostrado:** Next.js 16 App Router, React 19, Tailwind v4, Anthropic claude-sonnet-4-6 Vision, Supabase, Vercel — todo en un solo proyecto cohesivo.
+**Stack demostrado:** Next.js 16 App Router, React 19, Tailwind v4, Provider B claude-sonnet-4-6 Vision, Supabase, deployment platform — todo en un solo proyecto cohesivo.

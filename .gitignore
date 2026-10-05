@@ -44,3 +44,8 @@ next-env.d.ts
 
 # infisical local config (never committed)
 .infisical.json
+
+# Generated component diagnostics; accepted captures use canonical filenames.
+/docs/images/lab.*.png
+
+/docs/quality/*.log

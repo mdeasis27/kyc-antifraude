@@ -1,4 +1,4 @@
-// Cliente Truora API — KYC: documento, facial, listas, bases gubernamentales
+// Identity-verification client for document and screening checks.
 
 const TRUORA_BASE = "https://api.truora.com";
 
@@ -81,8 +81,8 @@ async function request<T>(
 
   if (!res.ok) {
     // Log detalle solo en servidor, no exponer al cliente
-    console.error(`Truora ${method} ${path} → ${res.status}`);
-    throw new Error(`Truora API error: ${res.status}`);
+    console.error(`Identity verification ${method} ${path} → ${res.status}`);
+    throw new Error(`Identity verification API error: ${res.status}`);
   }
 
   return res.json() as Promise<T>;
@@ -120,5 +120,5 @@ export async function pollCheck(
     if (result.status !== "pending") return result;
     await new Promise((r) => setTimeout(r, 2_000));
   }
-  throw new Error(`Truora check ${checkId} timed out after ${maxWaitMs}ms`);
+  throw new Error(`Verification check ${checkId} timed out after ${maxWaitMs}ms`);
 }
