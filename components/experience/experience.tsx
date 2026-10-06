@@ -1,10 +1,89 @@
 "use client";
-import {BusinessBrief} from "./business-brief";
-import { useEffect, useState } from "react";
-import { OutcomeBlock, ScenarioPicker, StoryStage } from "@/design-system/demo/decision-lab";
+import { useState } from "react";
 import { TracePlayer } from "@/design-system/demo/trace-player";
+import { MissionPrompt, MissionComparison } from "@/design-system/demo/mission-lab";
 import { useDemoRun } from "@/design-system/demo/use-demo-run";
-import { runExperience, type ExperienceInput } from "@/lib/experience/adapter";
-import {ScreeningScene} from "./screening-scene";
-const scenarios = { clear: { documentComplete: true, screeningFlag: false }, flagged: { documentComplete: true, screeningFlag: true } } satisfies Record<string, ExperienceInput>;
-export function Experience({ lang }: { lang: "en" | "es" }) { const es = lang === "es"; const [input, setInput] = useState<ExperienceInput>(scenarios.clear); const [selected, setSelected] = useState("clear"); const demo = useDemoRun(runExperience); useEffect(() => { demo.cancel(); }, [input.documentComplete, input.screeningFlag]); const change = (next: ExperienceInput) => { setInput(next); setSelected("custom"); demo.reset(); }; const reset = () => { setInput(scenarios.clear); setSelected("clear"); demo.reset(); }; return <main className="mx-auto max-w-6xl px-5 py-10"><div className="flex justify-between"><a href={`/${lang}`}>← {es ? "Portafolio" : "Portfolio"}</a><a href={`/${es ? "en" : "es"}/app`}>{es ? "EN" : "ES"}</a></div><h1 className="mt-8 text-4xl font-bold">{es ? "Compuertas de onboarding KYC" : "KYC onboarding gates"}</h1><BusinessBrief lang={lang}/><p className="mt-2 text-sm text-muted-foreground">{es ? "Cambiar el idioma reinicia el escenario local." : "Changing language resets the local scenario."}</p><div className="mt-8 grid gap-6 lg:grid-cols-[320px_1fr]"><section><ScenarioPicker locale={lang} selected={selected} onSelect={(id) => { setInput(scenarios[id as keyof typeof scenarios]); setSelected(id); demo.reset(); }} options={[{ id: "clear", label: es ? "Documento limpio" : "Clean document", description: es ? "La ruta continúa." : "The route proceeds." }, { id: "flagged", label: es ? "Señal detectada" : "Flag detected", description: es ? "El screening detiene la ruta." : "Screening stops the route." }]} /><label className="flex justify-between">{es ? "Documento completo" : "Document complete"}<input type="checkbox" checked={input.documentComplete} onChange={(event) => change({ ...input, documentComplete: event.target.checked })} /></label><label className="mt-3 flex justify-between">{es ? "Señal de screening" : "Screening flag"}<input type="checkbox" checked={input.screeningFlag} onChange={(event) => change({ ...input, screeningFlag: event.target.checked })} /></label>{demo.error && <p className="mt-3 text-danger" role="alert">{es ? "Los valores del escenario deben ser válidos." : demo.error}</p>}<button className="mt-5 w-full rounded bg-accent p-2 text-white" onClick={() => demo.execute(input)}>{es ? "Revisar" : "Check"}</button><div className="mt-3 flex gap-2"><button onClick={demo.cancel}>{es ? "Cancelar" : "Cancel"}</button><button onClick={reset}>{es ? "Restaurar" : "Reset"}</button></div></section><TracePlayer trace={demo.trace} locale={lang} executionMs={demo.run?.executionMs} translate={(key) => key === "document" ? (es ? "Documento verificado" : "Document checked") : (es ? "Screening y ruta" : "Screening and route")} renderStage={(frame) => <StoryStage locale={lang} title={es ? "Ruta de onboarding" : "Onboarding route"} caption={es ? "El registro documental cruza la compuerta de screening antes de revelar la ruta." : "The document record crosses screening before revealing the route."} step={frame.visible} total={frame.total}><ScreeningScene input={input} result={demo.run?.result??null} visible={frame.visible} complete={frame.complete} lang={lang}/>{frame.complete && demo.run && <OutcomeBlock title={demo.run.result.state === "reject" ? (es ? "Rechazar" : "Reject") : demo.run.result.state === "review" ? (es ? "Revisar" : "Review") : (es ? "Continuar" : "Proceed")} explanation={es ? "La ruta se calcula con señales locales ficticias." : demo.run.result.explanation} tone={demo.run.result.state === "reject" ? "danger" : demo.run.result.state === "review" ? "warning" : "success"} />}</StoryStage>} /></div></main>; }
+import { StoryHero, StorySection, AnalogyBlock, WhyIBuiltIt, FitGuide, ProvesBlock, EngineerNotes } from "@/design-system/demo/project-story";
+import { LanguageSwitch } from "@/design-system/components/language-switch";
+import { traceCopy } from "@/lib/experience/trace-copy";
+import { runMission } from "@/lib/experience/mission";
+import { KycStoryScene } from "@/lib/experience/story-scene";
+import { COMPLETE_FRAME } from "@/lib/experience/scene-state";
+import { STORY } from "@/lib/experience/story";
+
+const REPO = "https://github.com/mdeasis27/kyc-antifraude";
+const DEFAULT_THRESHOLD = 70;
+
+export function Experience({ lang: locale }: { lang: "en" | "es" }) {
+  const t = STORY[locale];
+  const [threshold, setThreshold] = useState(DEFAULT_THRESHOLD);
+  const [prediction, setPrediction] = useState<string | null>(null);
+  const demo = useDemoRun(runMission);
+  const run = demo.run;
+  const result = run?.result;
+  // Section 03 waits for the tape to finish; keyed to the trace so every new run resets it.
+  const [playedTrace, setPlayedTrace] = useState<typeof demo.trace | null>(null);
+  const played = demo.trace.length === 0 || playedTrace === demo.trace;
+  const clear = () => { setPrediction(null); demo.reset(); };
+  const reset = () => { setThreshold(DEFAULT_THRESHOLD); clear(); };
+  const scene = (frame: typeof COMPLETE_FRAME) => result ? <KycStoryScene frame={frame} result={result} locale={locale} /> : null;
+
+  return <main className="mx-auto max-w-5xl px-5 py-8 text-foreground sm:py-12">
+    <div className="mb-6 flex items-center justify-between gap-4">
+      <a className="font-mono text-xs text-muted-foreground underline-offset-4 hover:underline" href={`/${locale}`}>← {t.name}</a>
+      <LanguageSwitch locale={locale} />
+    </div>
+    <StoryHero name={t.name} oneLiner={t.oneLiner} chips={t.chips} />
+
+    <StorySection index={1} heading={t.analogy.heading}>
+      <AnalogyBlock paragraphs={t.analogy.paragraphs} dictionaryLabel={t.analogy.dictionaryLabel} dictionary={t.analogy.dictionary} />
+    </StorySection>
+
+    <WhyIBuiltIt title={t.why.title} text={t.why.text} />
+
+    <StorySection index={2} heading={t.tryIt.heading} lead={t.tryIt.lead}>
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,.8fr)_minmax(0,1.2fr)]">
+        <section className="min-w-0 rounded-xl border border-border bg-surface p-5">
+          <MissionPrompt locale={locale} question={t.tryIt.question(threshold)} prediction={prediction} onPredict={setPrediction} locked={Boolean(run) || demo.running} options={[{ id: "yes", label: t.tryIt.yes }, { id: "no", label: t.tryIt.no }]} />
+          <label className="mt-5 block text-sm">
+            <span className="flex justify-between"><span>{t.tryIt.thresholdLabel}</span><span className="font-mono">{threshold}%</span></span>
+            <input aria-label={t.tryIt.thresholdLabel} aria-valuetext={`${threshold}%`} className="mt-2 w-full" type="range" min="50" max="95" step="5" value={threshold} onChange={e => { setThreshold(Number(e.target.value)); clear(); }} />
+            <span className="mt-1 block text-xs text-muted-foreground">{t.tryIt.thresholdHint}</span>
+          </label>
+          <p className="mt-4 text-xs leading-5 text-muted-foreground">{t.tryIt.note}</p>
+          <div className="mt-6 flex flex-wrap gap-2">
+            <button type="button" data-run-experiment disabled={demo.running} className="min-w-0 flex-1 rounded-lg bg-accent px-4 py-3 text-sm font-medium text-white disabled:opacity-60" onClick={() => demo.execute({ threshold })}>{t.tryIt.simulate}</button>
+            <button type="button" className="rounded-lg border border-border px-3 py-3 text-sm" onClick={demo.cancel}>{t.tryIt.cancel}</button>
+            <button type="button" className="rounded-lg border border-border px-3 py-3 text-sm" onClick={reset}>{t.tryIt.reset}</button>
+          </div>
+          {demo.error ? <p role="alert" className="mt-3 text-sm text-danger">{t.tryIt.error}</p> : null}
+        </section>
+        <section className="min-w-0">
+          {run && result
+            ? (demo.trace.length === 0 ? scene(COMPLETE_FRAME) : <TracePlayer collapsible autoPlay headingLevel="h3" onComplete={() => setPlayedTrace(demo.trace)} translate={key => traceCopy(locale, key)} trace={demo.trace} locale={locale} executionMs={run.executionMs} renderStage={scene} />)
+            : <p className="rounded-xl border border-dashed border-border p-8 text-sm text-muted-foreground">{t.tryIt.idle}</p>}
+        </section>
+      </div>
+    </StorySection>
+
+    <StorySection index={3} heading={t.compare.heading} lead={t.compare.lead}>
+      {result && played ? <MissionComparison locale={locale} prediction={prediction} actual={result.counts.proceed >= 8 ? "yes" : "no"} actualLabel={t.scene.approvedOf(result.counts.proceed)} explanation={t.compare.sentence(result.comparison.withQueue, result.comparison.withoutQueue)} sides={[
+        { label: t.compare.withQueue, value: `${result.comparison.withQueue}`, detail: t.compare.rejected, positive: result.comparison.withQueue < result.comparison.withoutQueue },
+        { label: t.compare.withoutQueue, value: `${result.comparison.withoutQueue}`, detail: t.compare.rejected },
+      ]} /> : null}
+    </StorySection>
+
+    <StorySection index={4} heading={t.fit.heading}>
+      <FitGuide worthLabel={t.fit.worthLabel} worth={t.fit.worth} notLabel={t.fit.notLabel} not={t.fit.not} />
+    </StorySection>
+
+    <StorySection index={5} heading={t.proves.heading}>
+      <ProvesBlock text={t.proves.text} />
+    </StorySection>
+
+    <EngineerNotes summary={t.engineers.summary}>
+      <ul className="list-disc space-y-2 pl-5">{t.engineers.points.map(p => <li key={p}>{p}</li>)}</ul>
+      <a className="mt-4 inline-block text-accent underline underline-offset-4" href={REPO}>{t.engineers.repoLabel} →</a>
+    </EngineerNotes>
+  </main>;
+}
