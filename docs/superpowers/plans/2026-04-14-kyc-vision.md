@@ -51,7 +51,7 @@ Resultado esperado: se añaden `@ai-sdk/anthropic` y `@supabase/supabase-js` en 
 Reemplazar el contenido completo de `.env.local` con:
 
 ```bash
-# Anthropic — claude-sonnet-4-6 Vision
+# Provider B — claude-sonnet-4-6 Vision
 ANTHROPIC_API_KEY=sk-ant-REEMPLAZA_CON_TU_KEY
 
 # Supabase
@@ -61,13 +61,13 @@ SUPABASE_SERVICE_ROLE_KEY=eyJREEMPLAZA...
 ```
 
 > Para obtener estas claves:
-> - Anthropic: https://console.anthropic.com → API Keys
+> - Provider B: https://console.anthropic.com → API Keys
 > - Supabase: Dashboard del proyecto → Settings → API
 
 - [ ] **Step 3: Actualizar `.env.example`**
 
 ```bash
-# Anthropic — claude-sonnet-4-6 Vision
+# Provider B — claude-sonnet-4-6 Vision
 ANTHROPIC_API_KEY=
 
 # Supabase
@@ -1315,7 +1315,7 @@ export default function Home() {
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-4">
-          Powered by Anthropic Claude · Supabase · Next.js 16
+          Powered by Provider B Claude · Supabase · Next.js 16
         </p>
       </div>
     </div>
@@ -1430,7 +1430,7 @@ git commit -m "refactor: remove truora.ts and synthesizer.ts (replaced by claude
 
 ---
 
-## Task 12: Deployment en Vercel
+## Task 12: Deployment en plataforma de despliegue
 
 - [ ] **Step 1: Crear repositorio en GitHub si no existe**
 
@@ -1444,7 +1444,7 @@ O si ya existe, hacer push:
 git push origin main
 ```
 
-- [ ] **Step 2: Instalar Vercel CLI e iniciar proyecto**
+- [ ] **Step 2: Instalar plataforma de despliegue CLI e iniciar proyecto**
 
 ```bash
 npm i -g vercel
@@ -1453,7 +1453,7 @@ vercel
 
 Seguir el wizard: seleccionar el repo, framework Next.js (detectado automáticamente).
 
-- [ ] **Step 3: Configurar variables de entorno en Vercel**
+- [ ] **Step 3: Configurar variables de entorno en plataforma de despliegue**
 
 ```bash
 vercel env add ANTHROPIC_API_KEY production
@@ -1462,7 +1462,7 @@ vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY production
 vercel env add SUPABASE_SERVICE_ROLE_KEY production
 ```
 
-O desde el dashboard: Vercel → Proyecto → Settings → Environment Variables.
+O desde el dashboard: plataforma de despliegue → Proyecto → Settings → Environment Variables.
 
 - [ ] **Step 4: Deploy a producción**
 
@@ -1504,4 +1504,4 @@ git push origin main
 | Link "Ver Dashboard →" en resultado | Task 9 |
 | Metadata correcta en layout | Task 10 |
 | Eliminar truora.ts + synthesizer.ts | Task 11 |
-| Deploy en Vercel | Task 12 |
+| Deploy en plataforma de despliegue | Task 12 |

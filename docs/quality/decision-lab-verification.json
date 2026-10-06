@@ -1,0 +1,24 @@
+{
+  "commands": [
+    {
+      "command": "pnpm.cmd test",
+      "exitCode": 0,
+      "log": "decision-lab-test.log"
+    },
+    {
+      "command": "pnpm.cmd run lint",
+      "exitCode": 0,
+      "log": "decision-lab-lint.log"
+    },
+    {
+      "command": "node node_modules/typescript/bin/tsc --noEmit --incremental false",
+      "exitCode": 0,
+      "log": "decision-lab-types.log"
+    },
+    {
+      "command": "pnpm.cmd run build",
+      "exitCode": 0,
+      "log": "decision-lab-build.log"
+    }
+  ]
+}

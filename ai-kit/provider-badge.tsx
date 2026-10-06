@@ -17,18 +17,14 @@ const PROVIDER_COLORS: Record<string, string> = {
   "openai-byok": "bg-green-50 text-green-700 border-green-200",
 };
 
-export function ProviderBadge({ provider, model, latency_ms }: Props) {
+export function ProviderBadge({ provider, latency_ms }: Props) {
   const colorClass =
     PROVIDER_COLORS[provider.toLowerCase()] ??
     "bg-zinc-50 text-zinc-600 border-zinc-200";
 
-  const shortModel = model.includes("/") ? model.split("/").pop()! : model;
-
   return (
     <div className={`inline-flex items-center gap-2 rounded border px-2.5 py-1 text-xs font-medium ${colorClass}`}>
-      <span className="capitalize">{provider}</span>
-      <span className="opacity-60">·</span>
-      <span className="font-mono opacity-80">{shortModel}</span>
+      <span>LLM</span>
       <span className="opacity-60">·</span>
       <span>{latency_ms.toLocaleString()}ms</span>
     </div>

@@ -1,4 +1,4 @@
-// Síntesis LLM — toma todos los resultados de Truora y genera decisión final
+// LLM synthesis consumes verification results and produces the final decision.
 
 import { z } from "zod";
 import { chat, AllProvidersFailedError } from "@/ai-kit/client";

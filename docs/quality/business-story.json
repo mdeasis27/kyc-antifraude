@@ -1,0 +1,40 @@
+{
+  "en": {
+    "user": "Onboarding operations reviewer",
+    "problem": "A new application must not continue when required document fields are missing or screening raises a blocking flag.",
+    "workflow": "Inspect documentary completeness, follow the screening branch, then choose proceed, review or stop.",
+    "decision": "Allow the application to continue or hold it for a human decision.",
+    "value": "Turns onboarding policy into an inspectable process with visible stopping points.",
+    "visual": "An application moves through documentary and screening gates; the resulting lane shows proceed, review or stop.",
+    "scenarioA": {
+      "title": "Complete application",
+      "input": "Complete document, no screening flag.",
+      "observation": "The application proceeds through both checks."
+    },
+    "scenarioB": {
+      "title": "Flagged application",
+      "input": "Complete document, screening flag enabled.",
+      "observation": "The screening gate stops the application; no paid check is started."
+    },
+    "limitation": "A deterministic local state machine, not identity verification or calibrated fraud prediction."
+  },
+  "es": {
+    "user": "Revisor de operaciones de onboarding",
+    "problem": "Una solicitud no debe continuar cuando faltan campos del documento o el screening activa una señal bloqueante.",
+    "workflow": "Inspecciona la integridad documental, sigue la rama de screening y decide continuar, revisar o detener.",
+    "decision": "Permitir que la solicitud continúe o retenerla para una decisión humana.",
+    "value": "Convierte una política de onboarding en un proceso inspeccionable con puntos de detención visibles.",
+    "visual": "Una solicitud atraviesa compuertas documentales y de screening; el carril resultante muestra continuar, revisar o detener.",
+    "scenarioA": {
+      "title": "Solicitud completa",
+      "input": "Documento completo, sin señal de screening.",
+      "observation": "La solicitud supera ambas comprobaciones."
+    },
+    "scenarioB": {
+      "title": "Solicitud con señal",
+      "input": "Documento completo, señal de screening activada.",
+      "observation": "La compuerta detiene la solicitud; no se inicia ninguna comprobación de pago."
+    },
+    "limitation": "Máquina de estados local determinista; no verifica identidad ni predice fraude con probabilidades calibradas."
+  }
+}

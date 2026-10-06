@@ -1,19 +1,19 @@
 // design-system/fonts.ts
-// Source of truth for portfolio fonts — v3.0.0 (Vercel/Geist).
+// Source of truth for portfolio fonts. Bundled for reproducible offline builds.
 // Consumed by the hub and any project that runs brand:sync.
-import { Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 
-export const geist = Geist({
+export const geist = localFont({
+  src: "./fonts/Geist.woff2",
   variable: "--font-sans",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: "100 900",
   display: "swap",
 });
 
-export const geistMono = Geist_Mono({
+export const geistMono = localFont({
+  src: "./fonts/GeistMono.woff2",
   variable: "--font-mono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: "100 900",
   display: "swap",
 });
 

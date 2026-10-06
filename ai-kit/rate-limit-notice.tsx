@@ -29,7 +29,7 @@ export function RateLimitNotice({
     >
       <p className="font-medium">Live mode temporarily unavailable.</p>
       <p className="mt-1 text-foreground/70">
-        OpenRouter rate limit reached for this IP
+        LLM API rate limit reached for this IP
         {retryAfterSeconds ? ` — retry in ~${retryAfterSeconds}s` : ""}.
         {" "}
         Switch to demo mode to keep exploring with pre-computed cases.

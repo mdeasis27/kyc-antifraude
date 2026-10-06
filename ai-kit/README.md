@@ -4,14 +4,14 @@ Shared AI primitives for MDEA portfolio projects that use LLMs. Parallel to `des
 
 ## What's included
 
-- `models.ts` — prioritized allowlist of free OpenRouter models.
+- `models.ts` — prioritized allowlist of free LLM API models.
 - `client.ts` — `createMdeaAi()` with dynamic discovery + 10-min cache + fallback.
 - `demo-mode.ts` — convention and helpers for pre-computed demo cases.
 - `rate-limit.tsx` — UI to recover gracefully when live mode hits a rate limit.
 
 ## Convention — demo mode obligatorio
 
-**Every MDEA portfolio project that uses LLMs must ship a demo mode that works without any API key.** Rationale: OpenRouter free-tier rate limits per IP mean a public demo can break for a visitor if previous visitors exhausted quota. Demo mode guarantees the product always works.
+**Every MDEA portfolio project that uses LLMs must ship a demo mode that works without any API key.** Rationale: LLM API free-tier rate limits per IP mean a public demo can break for a visitor if previous visitors exhausted quota. Demo mode guarantees the product always works.
 
 ```ts
 import { defineDemoCase, pickDemoCase } from "@/ai-kit/demo-mode";
@@ -32,7 +32,7 @@ import { createMdeaAi, NoModelAvailableError } from "@/ai-kit/client";
 const ai = createMdeaAi({ apiKey: process.env.OPENROUTER_API_KEY });
 try {
   const { model } = await ai.selectModel();
-  // call OpenRouter with `model`
+  // call LLM API with `model`
 } catch (err) {
   if (err instanceof NoModelAvailableError) {
     // fall back to demo mode

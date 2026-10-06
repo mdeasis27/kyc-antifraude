@@ -6,6 +6,9 @@ import type { ChatOptions, ChatResponse } from "../types";
 import { ProviderError } from "../errors";
 
 const DEFAULT_MODEL = "gemini-2.0-flash";
+type GeminiResponse = { text?: string };
+type GeminiClient = { models: { generateContent(input: { model: string; contents: Array<{ role: "user" | "model"; parts: Array<{ text: string }> }>; config: { maxOutputTokens: number; temperature: number; systemInstruction?: string } }): Promise<GeminiResponse> } };
+type GeminiConstructor = new (options: { apiKey: string }) => GeminiClient;
 
 export function createGeminiProvider(apiKey: string | undefined): LLMProvider {
   return {
@@ -24,22 +27,21 @@ export function createGeminiProvider(apiKey: string | undefined): LLMProvider {
       const start = Date.now();
 
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        // webpackIgnore: package only needed at runtime (BYOK); not bundled by Turbopack
-        const { GoogleGenAI } = await import(/* webpackIgnore: true */ "@google/genai" as any);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const genai: any = new GoogleGenAI({ apiKey });
+        // A variable module name keeps this optional SDK out of consumer dependency graphs.
+        const moduleName = "@google/genai";
+        const { GoogleGenAI: imported } = await import(/* webpackIgnore: true */ moduleName);
+        const GoogleGenAI = imported as unknown as GeminiConstructor;
+        const genai = new GoogleGenAI({ apiKey });
 
         const systemMsg = opts.messages.find((m) => m.role === "system");
         const userMessages = opts.messages.filter((m) => m.role !== "system");
 
-        const contents = userMessages.map((m) => ({
+        const contents: Array<{ role: "user" | "model"; parts: Array<{ text: string }> }> = userMessages.map((m) => ({
           role: m.role === "assistant" ? "model" : "user",
           parts: [{ text: m.content }],
         }));
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const response: any = await genai.models.generateContent({
+        const response = await genai.models.generateContent({
           model: DEFAULT_MODEL,
           contents,
           config: {

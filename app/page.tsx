@@ -5,7 +5,7 @@ import { cn } from "@/design-system/utils";
 
 const STACK = [
   "Next.js 16",
-  "Vercel AI SDK",
+  "AI SDK",
   "TypeScript",
   "Tailwind v4",
   "Zod",

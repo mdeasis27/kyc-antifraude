@@ -1,0 +1,15 @@
+import type {ExperienceInput,ExperienceResult} from "@/lib/experience/adapter";
+export function ScreeningScene({input,result,visible,complete,lang}:{input:ExperienceInput;result:ExperienceResult|null;visible:number;complete:boolean;lang:"en"|"es"}){
+ const es=lang==="es";
+ const first=visible>=1;
+ const screened=visible>=2&&input.documentComplete;
+ const branch=result?.state==="reject"?2:result?.state==="review"?1:0;
+ const color=["var(--success)","var(--warning)","var(--danger)"][branch];
+ return <div><svg role="img" aria-label={es?"Solicitud, comprobación documental, screening y carril de salida":"Application, document check, screening and exit lane"} viewBox="0 0 740 280" className="h-auto w-full">
+  <rect x="15" y="75" width="85" height="100" rx="8" fill="var(--surface)" stroke="var(--border)"/><path d="M30 100H85M30 120H85M30 140H65" stroke="var(--muted)" strokeWidth="3"/><text x="57" y="200" textAnchor="middle" fill="var(--muted)" fontSize="12">{es?"Solicitud":"Application"}</text>
+  <path d="M100 125H180M330 125H380" stroke="var(--info)" strokeWidth="3" strokeDasharray={first?undefined:"5 6"}/>
+  <rect x="180" y="85" width="150" height="80" rx="8" fill="var(--surface)" stroke={first?(input.documentComplete?"var(--success)":"var(--warning)"):"var(--border)"} strokeWidth="2"/><text x="255" y="113" textAnchor="middle" fill="var(--foreground)" fontSize="12">{es?"Documento":"Document"}</text><text x="255" y="142" textAnchor="middle" fill="var(--muted)" fontSize="11">{first?(input.documentComplete?(es?"Completo":"Complete"):(es?"Faltan campos":"Missing fields")):(es?"En espera":"Waiting")}</text>
+  <rect x="380" y="85" width="150" height="80" rx="8" fill="var(--surface)" stroke={screened?(input.screeningFlag?"var(--danger)":"var(--success)"):"var(--border)"} strokeWidth="2"/><text x="455" y="113" textAnchor="middle" fill="var(--foreground)" fontSize="12">Screening</text><text x="455" y="142" textAnchor="middle" fill="var(--muted)" fontSize="11">{screened?(input.screeningFlag?(es?"Señal bloqueante":"Blocking flag"):(es?"Sin señales":"No flags")):first&&!input.documentComplete?(es?"No iniciado":"Not started"):(es?"En espera":"Waiting")}</text>
+  {[es?"Continuar":"Proceed",es?"Revisar":"Review",es?"Detener":"Stop"].map((label,index)=><g key={label} opacity={complete?(index===branch?1:.2):.3}><path d={`M530 125H570V${55+index*80}H610`} fill="none" stroke={complete&&index===branch?color:"var(--border)"} strokeWidth="3"/><rect x="610" y={35+index*80} width="115" height="40" rx="6" fill="var(--surface)" stroke={complete&&index===branch?color:"var(--border)"}/><text x="667" y={60+index*80} textAnchor="middle" fill="var(--foreground)" fontSize="12">{label}</text></g>)}
+ </svg><p className="mb-5 text-sm leading-7">{first?(input.documentComplete?(es?"El documento permite pasar al screening local.":"The document can proceed to local screening."):(es?"Completa los campos antes de iniciar screening.":"Complete the fields before screening starts.")):(es?"Ejecuta la revisión para mover la solicitud.":"Run the review to move the application.")}</p></div>;
+}

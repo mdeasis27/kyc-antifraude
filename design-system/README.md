@@ -116,3 +116,11 @@ This copies the entire `design-system/` from `portafolio-mdea/` into the current
 2. Update `globals.css` consumers if needed.
 3. Add an entry to `CHANGELOG.md`.
 4. Run `pnpm brand:propagate` from the hub to push changes to all siblings.
+
+## Recruiter experience primitives
+
+`i18n/locale.ts` normalizes EN/ES paths. `LocaleProvider` supplies the explicit route locale; English is the default. `LanguageSwitch` retains pathname, query and hash; domain forms own session snapshots or a reset warning.
+
+`demo/types.ts` defines typed local/simulation/live runs with measured execution time and computed trace. `useDemoRun` cancels previous requests and ignores obsolete completions. `DemoShell` lays out controls and domain visualization. `TracePlayer` exposes keyboard-operable playback, speed and show-all controls; playback is not execution latency.
+
+Check primitives: `node --test design-system/demo/foundation.node-test.mjs`.
