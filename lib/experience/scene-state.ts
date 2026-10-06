@@ -14,4 +14,27 @@ export function revealedApplicants(frame: { visible: number; total: number; comp
   return Math.ceil((n * frame.visible) / frame.total);
 }
 
+/** Seat of each applicant inside its outcome box: the first approved sits at 0, the second at 1, and so on. */
+export function outcomeSeats(items: readonly { decision: Decision }[]): number[] {
+  const used: Record<Decision, number> = { proceed: 0, review: 0, reject: 0 };
+  return items.map(a => used[a.decision]++);
+}
+
+/** The scene moves in half steps: at 2i+1 applicant i reaches the counter, at 2i+2 it leaves for its box. */
+export function atCounter(phase: number, n: number): number | null {
+  if (phase <= 0 || phase >= 2 * n) return null;
+  return Math.ceil(phase / 2) - 1;
+}
+
+/**
+ * Keeps the walk (two half steps per applicant) within one applicant of the trace target:
+ * stepping back or replaying walks the newest applicant again, a fast trace skips ahead to it,
+ * and a jump of more than one applicant to the end (show all) lands on the final state at once.
+ */
+export function syncStep(step: number, target: number, complete: boolean): number {
+  if (step > target) return Math.max(0, target - 2);
+  if (step < target - 2) return complete && step < target - 4 ? target : target - 2;
+  return step;
+}
+
 export const COMPLETE_FRAME: PlaybackFrame<TraceEvent> = { visible: 0, total: 0, event: undefined, complete: true };

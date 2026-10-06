@@ -35,3 +35,9 @@ test("approved count agrees in number", () => {
   assert.equal(STORY.es.scene.approvedOf(1), "Se aprobó sola 1 de 12");
   assert.equal(STORY.es.scene.approvedOf(8), "Se aprobaron solas 8 de 12");
 });
+
+test("the scene summary agrees in number", () => {
+  assert.equal(STORY.es.scene.summary(1, 2), "1 fue con el gerente y 2 se rechazaron.");
+  assert.equal(STORY.es.scene.summary(2, 1), "2 fueron con el gerente y 1 se rechazó.");
+  assert.equal(STORY.en.scene.summary(2, 1), "2 went to the manager and 1 was rejected.");
+});
