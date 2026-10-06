@@ -9,7 +9,7 @@
     "lint": "eslint",
     "brand:sync": "node ../portafolio-mdea/scripts/brand-sync.mjs",
     "ai:sync": "node ../portafolio-mdea/scripts/ai-sync.mjs",
-    "test": "tsx --test lib/experience/adapter.test.ts"
+    "test": "tsx --test lib/experience/*.test.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.52",
