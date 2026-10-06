@@ -26,4 +26,15 @@ export function atCounter(phase: number, n: number): number | null {
   return Math.ceil(phase / 2) - 1;
 }
 
+/**
+ * Keeps the walk (two half steps per applicant) within one applicant of the trace target:
+ * stepping back or replaying walks the newest applicant again, a fast trace skips ahead to it,
+ * and a jump of more than one applicant to the end (show all) lands on the final state at once.
+ */
+export function syncStep(step: number, target: number, complete: boolean): number {
+  if (step > target) return Math.max(0, target - 2);
+  if (step < target - 2) return complete && step < target - 4 ? target : target - 2;
+  return step;
+}
+
 export const COMPLETE_FRAME: PlaybackFrame<TraceEvent> = { visible: 0, total: 0, event: undefined, complete: true };

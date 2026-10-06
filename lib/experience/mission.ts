@@ -6,18 +6,15 @@ export type MissionInput = { threshold: number };
 /** comparison counts rejected applicants. */
 export type MissionResult = ApplicantsResult & { comparison: { withQueue: number; withoutQueue: number } };
 
-const STEP = 3;
-
-/** Screens the 12 applicants at one line; the trace reveals them three at a time. */
+/** Screens the 12 applicants at one line; the trace reveals them one per step with its decision. */
 export const runMission: DemoAdapter<MissionInput, MissionResult> = async (input, signal, onEvent) => {
   const startedAt = performance.now();
   const line = input.threshold / 100;
   const run = runApplicants(line);
   const trace: TraceEvent[] = [];
-  for (let i = 0; i < run.items.length; i += STEP) {
+  for (const [i, a] of run.items.entries()) {
     if (signal.aborted) throw new DOMException("Aborted", "AbortError");
-    const n = i / STEP + 1;
-    const event: TraceEvent = { id: `batch-${n}`, step: n, kind: "decision", messageKey: `batch.${n}`, timestampMs: performance.now() - startedAt, evidenceIds: run.items.slice(i, i + STEP).map(a => a.id) };
+    const event: TraceEvent = { id: `screen-${i + 1}`, step: i + 1, kind: "decision", messageKey: `screened.${a.decision}`, timestampMs: performance.now() - startedAt, evidenceIds: [a.id] };
     trace.push(event);
     onEvent(event);
   }

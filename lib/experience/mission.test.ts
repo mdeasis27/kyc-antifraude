@@ -2,10 +2,11 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { runMission } from "./mission";
 
-test("reveals the 12 applicants three at a time and compares with no review queue", async () => {
+test("reveals the 12 applicants one per step with its decision and compares with no review queue", async () => {
   const r = await runMission({ threshold: 70 }, new AbortController().signal, () => {});
-  assert.equal(r.trace.length, 4);
-  assert.deepEqual(r.trace[0].evidenceIds, ["applicant-1", "applicant-2", "applicant-3"]);
+  assert.equal(r.trace.length, 12);
+  assert.deepEqual(r.trace.map(e => e.evidenceIds), r.result.items.map(a => [a.id]));
+  assert.deepEqual(r.trace.map(e => e.messageKey), r.result.items.map(a => `screened.${a.decision}`));
   assert.deepEqual(r.result.comparison, { withQueue: 2, withoutQueue: 4 });
 });
 

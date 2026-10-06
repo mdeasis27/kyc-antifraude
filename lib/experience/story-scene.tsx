@@ -7,7 +7,7 @@ import { OutcomeTape, useReducedMotion } from "@/design-system/demo/project-stor
 import { tapeCounts, type TapeStatus } from "@/design-system/demo/outcome-tape";
 import type { MissionResult } from "./mission";
 import type { ScreenedApplicant } from "./screening";
-import { atCounter, kycCells, outcomeSeats, revealedApplicants } from "./scene-state";
+import { atCounter, kycCells, outcomeSeats, revealedApplicants, syncStep } from "./scene-state";
 import { STORY, type KycStory } from "./story";
 
 type Outcome = Exclude<TapeStatus, "pending">;
@@ -16,8 +16,8 @@ const FILL: Record<Outcome, string> = { served: "fill-success", rerouted: "fill-
 const STROKE: Record<Outcome, string> = { served: "stroke-success", rerouted: "stroke-info", lost: "stroke-danger" };
 const BOX_Y: Record<Outcome, number> = { served: 12, rerouted: 134, lost: 256 };
 const OUTCOMES = ["served", "rerouted", "lost"] as const;
-/** Half step of the walk: reach the counter, then leave for the box. */
-const TICK_MS = 300;
+/** Half step of the walk: reach the counter, then leave for the box. Two of them fit inside the fastest trace step (200 ms at 4x). */
+const TICK_MS = 100;
 const COUNTER_X = 230;
 const FLOOR_Y = 330;
 const BAR_X = 24;
@@ -44,10 +44,11 @@ export function KycStoryScene({ frame, result, locale }: { frame: PlaybackFrame<
   const line = Math.round(result.line * 100);
   const target = 2 * revealedApplicants(frame, n, reduced);
 
-  // Each new run starts the walk again from the front of the line.
+  // Each new run starts the walk again from the front of the line; the walk follows the trace both ways.
   const [run, setRun] = useState(result);
   const [step, setStep] = useState(0);
   if (run !== result) { setRun(result); setStep(0); }
+  else if (!reduced && syncStep(step, target, frame.complete) !== step) setStep(syncStep(step, target, frame.complete));
   useEffect(() => {
     if (reduced || step >= target) return;
     const timer = setTimeout(() => setStep(s => s + 1), TICK_MS);
@@ -65,7 +66,7 @@ export function KycStoryScene({ frame, result, locale }: { frame: PlaybackFrame<
   const final = result.counts;
   const summary = `${copy.approvedOf(final.proceed)}. ${copy.summary(final.review, final.reject)}`;
   const status = inspected && current !== null ? `${copy.applicant(current + 1)}: ${reasonText(copy, inspected, line)}` : placed === n ? summary : "";
-  const motion = reduced ? "" : "transition-[transform,opacity] duration-300 ease-in-out";
+  const motion = reduced ? "" : "transition-[transform,opacity] duration-100 ease-in-out";
 
   const position = (i: number): [number, number] => {
     if (i < placed) {
@@ -96,7 +97,7 @@ export function KycStoryScene({ frame, result, locale }: { frame: PlaybackFrame<
         <text x="99" y="120" textAnchor="middle" fontSize="20" className="fill-muted-foreground">{copy.idCard}</text>
         <text x="261" y="120" textAnchor="middle" fontSize="20" className="fill-muted-foreground">{copy.face}</text>
         <rect x={BAR_X} y="134" width={BAR_W} height="14" rx="7" className="fill-foreground/10" />
-        <rect x={BAR_X} y="134" width={inspected && !hardStop ? BAR_W * inspected.faceMatch : 0} height="14" rx="7" className={`${inspected ? FILL[TONE[inspected.decision]] : ""} ${reduced ? "" : "transition-[width] duration-300"}`} />
+        <rect x={BAR_X} y="134" width={inspected && !hardStop ? BAR_W * inspected.faceMatch : 0} height="14" rx="7" className={`${inspected ? FILL[TONE[inspected.decision]] : ""} ${reduced ? "" : "transition-[width] duration-100"}`} />
         <line x1={BAR_X + BAR_W * result.line} y1="128" x2={BAR_X + BAR_W * result.line} y2="154" className="stroke-foreground" strokeWidth="2" strokeDasharray="3 2" />
         <text x={BAR_X} y="176" fontSize="20" fontWeight="600" className="fill-foreground">{inspected ? panelTag(copy, inspected) : ""}</text>
         <text x={BAR_X + BAR_W} y="176" textAnchor="end" fontSize="20" className="fill-muted-foreground">{copy.lineLabel(line)}</text>
