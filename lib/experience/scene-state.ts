@@ -14,4 +14,16 @@ export function revealedApplicants(frame: { visible: number; total: number; comp
   return Math.ceil((n * frame.visible) / frame.total);
 }
 
+/** Seat of each applicant inside its outcome box: the first approved sits at 0, the second at 1, and so on. */
+export function outcomeSeats(items: readonly { decision: Decision }[]): number[] {
+  const used: Record<Decision, number> = { proceed: 0, review: 0, reject: 0 };
+  return items.map(a => used[a.decision]++);
+}
+
+/** The scene moves in half steps: at 2i+1 applicant i reaches the counter, at 2i+2 it leaves for its box. */
+export function atCounter(phase: number, n: number): number | null {
+  if (phase <= 0 || phase >= 2 * n) return null;
+  return Math.ceil(phase / 2) - 1;
+}
+
 export const COMPLETE_FRAME: PlaybackFrame<TraceEvent> = { visible: 0, total: 0, event: undefined, complete: true };

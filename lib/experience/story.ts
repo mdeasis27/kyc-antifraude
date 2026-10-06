@@ -1,6 +1,7 @@
 import type { Heading } from "@/design-system/demo/project-story";
 
-type NodeCopy = { name: string; sub: string; analogy: string };
+type Outcomes = { served: string; rerouted: string; lost: string };
+type ReasonCopy = { clear: (pct: number, line: number) => string; belowLine: (pct: number, line: number) => string; pep: (pct: number) => string; noMatch: (pct: number) => string; sanctions: string; document: string };
 
 export interface KycStory {
   name: string;
@@ -13,7 +14,7 @@ export interface KycStory {
   fit: { heading: Heading; worthLabel: string; worth: string; notLabel: string; not: string };
   proves: { heading: Heading; text: string };
   engineers: { summary: string; points: string[]; repoLabel: string };
-  scene: { title: string; caption: string; statusLabels: { active: string; success: string }; tapeLabel: string; nodes: { applicants: NodeCopy; checks: NodeCopy; face: NodeCopy; decision: NodeCopy }; tape: { served: string; rerouted: string; lost: string }; approvedOf: (n: number) => string };
+  scene: { title: string; caption: string; tapeLabel: string; tape: Outcomes; boxes: Outcomes; queue: string; counter: string; idCard: string; face: string; lineLabel: (line: number) => string; tags: { sanctions: string; document: string; pep: string }; applicant: (n: number) => string; reasons: ReasonCopy; summary: (rerouted: number, lost: number) => string; approvedOf: (n: number) => string };
 }
 
 export const STORY: Record<"en" | "es", KycStory> = {
@@ -86,16 +87,26 @@ export const STORY: Record<"en" | "es", KycStory> = {
     },
     scene: {
       title: "What happened to each application",
-      caption: "Watch the applications arrive three at a time.",
-      statusLabels: { active: "tuned by you", success: "stopped a hard case" },
+      caption: "One by one, each person reaches the counter. The teller checks the ID first, then holds the face against your line.",
       tapeLabel: "Twelve applicants, in the order they applied",
-      nodes: {
-        applicants: { name: "Applications", sub: "12 people", analogy: "the line at the branch" },
-        checks: { name: "Document and lists", sub: "hard stops", analogy: "the ID check" },
-        face: { name: "Face match", sub: "selfie against ID", analogy: "the teller's look" },
-        decision: { name: "Decision", sub: "approve, review or reject", analogy: "the counter" },
-      },
       tape: { served: "approved on its own", rerouted: "sent to the manager", lost: "rejected" },
+      boxes: { served: "Approved", rerouted: "Manager", lost: "Rejected" },
+      queue: "the line",
+      counter: "the counter",
+      idCard: "ID",
+      face: "face",
+      lineLabel: (line) => `your line ${line}%`,
+      tags: { sanctions: "sanctions list", document: "invalid document", pep: "exposed person" },
+      applicant: (n) => `Applicant ${n}`,
+      reasons: {
+        clear: (pct, line) => `face match ${pct}%, over your line of ${line}%. Account opened.`,
+        belowLine: (pct, line) => `face match ${pct}%, under your line of ${line}%. Goes to the manager.`,
+        pep: (pct) => `face match ${pct}%, but a politically exposed person. Goes to the manager.`,
+        noMatch: (pct) => `face match ${pct}%, the face does not match the ID. Rejected.`,
+        sanctions: "shows up on a sanctions list. Rejected.",
+        document: "sent an invalid document. Rejected.",
+      },
+      summary: (rerouted, lost) => `${rerouted} went to the manager and ${lost} ${lost === 1 ? "was" : "were"} rejected.`,
       approvedOf: (n) => (n === 1 ? "1 of 12 approved on its own" : `${n} of 12 approved on their own`),
     },
   },
@@ -168,16 +179,26 @@ export const STORY: Record<"en" | "es", KycStory> = {
     },
     scene: {
       title: "Qué pasó con cada solicitud",
-      caption: "Mira cómo llegan las solicitudes de tres en tres.",
-      statusLabels: { active: "ajustado por ti", success: "detuvo un caso duro" },
+      caption: "Una por una, cada persona llega a la ventanilla. El cajero revisa primero la identificación y luego compara la cara contra tu línea.",
       tapeLabel: "Doce solicitantes, en el orden en que llegaron",
-      nodes: {
-        applicants: { name: "Solicitudes", sub: "12 personas", analogy: "la fila en sucursal" },
-        checks: { name: "Documento y listas", sub: "altos duros", analogy: "revisar la identificación" },
-        face: { name: "Parecido", sub: "selfie contra foto", analogy: "la mirada del cajero" },
-        decision: { name: "Decisión", sub: "aprueba, revisa o rechaza", analogy: "la ventanilla" },
-      },
       tape: { served: "aprobada sola", rerouted: "con el gerente", lost: "rechazada" },
+      boxes: { served: "Aprobada", rerouted: "Gerente", lost: "Rechazada" },
+      queue: "la fila",
+      counter: "ventanilla",
+      idCard: "identificación",
+      face: "su cara",
+      lineLabel: (line) => `tu línea ${line}%`,
+      tags: { sanctions: "lista de sanciones", document: "documento inválido", pep: "persona expuesta" },
+      applicant: (n) => `Solicitante ${n}`,
+      reasons: {
+        clear: (pct, line) => `parecido ${pct}%, pasa tu línea de ${line}%. Cuenta abierta.`,
+        belowLine: (pct, line) => `parecido ${pct}%, menos que tu línea de ${line}%. Va con el gerente.`,
+        pep: (pct) => `parecido ${pct}%, pero es una persona políticamente expuesta. Va con el gerente.`,
+        noMatch: (pct) => `parecido ${pct}%, la cara no corresponde a la identificación. Rechazada.`,
+        sanctions: "aparece en una lista de sanciones. Rechazada.",
+        document: "mandó un documento inválido. Rechazada.",
+      },
+      summary: (rerouted, lost) => `${rerouted} ${rerouted === 1 ? "fue" : "fueron"} con el gerente y ${lost} ${lost === 1 ? "se rechazó" : "se rechazaron"}.`,
       approvedOf: (n) => (n === 1 ? "Se aprobó sola 1 de 12" : `Se aprobaron solas ${n} de 12`),
     },
   },
