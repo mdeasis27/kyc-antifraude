@@ -1,5 +1,9 @@
 # Onboarding screening
 
+<!-- community-badges -->
+[![CI](https://github.com/mdeasis27/kyc-antifraude/actions/workflows/ci.yml/badge.svg)](https://github.com/mdeasis27/kyc-antifraude/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+<!-- /community-badges -->
+
 [Español](README.es.md) · [Try the demo](https://kyc-antifraude-manueldeasis27-2515s-projects.vercel.app/en/app) · [Case study](https://manueldeasis.com/en/projects/kyc-antifraude) · [Source](https://github.com/mdeasis27/kyc-antifraude)
 
 ![Actual interactive local interface](docs/images/cover.png)
@@ -77,3 +81,9 @@ Turns onboarding policy into an inspectable process with visible stopping points
 Inputs use fictional or anonymized examples. Optional live integrations require their own credentials and operational setup. Secrets belong in the configured secret manager, never in local secret files or Git. Use the existing `infisical run -- <command>` workflow when live integration is needed. This repository does not publish or deploy automatically as part of the local demo.
 
 ![Actual English demo capture](docs/images/demo.png)
+
+<!-- community-section -->
+## License and contributing
+
+Released under the [MIT License](LICENSE). Issues and pull requests are welcome: read [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md) first. To report a vulnerability, see [SECURITY.md](SECURITY.md).
+<!-- /community-section -->
