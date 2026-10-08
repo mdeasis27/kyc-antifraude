@@ -25,7 +25,7 @@ function buildDefaultProviders(): LLMProvider[] {
       apiKey: process.env.OPENROUTER_API_KEY,
       defaultModel: "meta-llama/llama-3.3-70b-instruct:free",
       extraHeaders: {
-        "HTTP-Referer": "https://manueldeasis.com",
+        "HTTP-Referer": "https://portafolio-mdea.vercel.app",
         "X-Title": "MDEA Portfolio",
       },
     }),
