@@ -17,7 +17,7 @@ export default function LandingPage() {
       <header className="sticky top-0 z-40 w-full border-b border-[var(--border)] bg-background/70 backdrop-blur-md">
         <div className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between px-6">
           <Link
-            href="https://manueldeasis.com"
+            href="https://portafolio-mdea.vercel.app"
             className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
           >
             <svg
