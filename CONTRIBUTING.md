@@ -10,7 +10,7 @@ Thanks for taking the time to improve this project. Issues and pull requests are
 
 ## Set up
 
-You need Node 22 and [pnpm](https://pnpm.io) 9.
+You need Node 22 and [pnpm](https://pnpm.io) 10.
 
 ```bash
 git clone https://github.com/mdeasis27/kyc-antifraude.git
