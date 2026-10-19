@@ -1,5 +1,8 @@
 # AI Kit Changelog
 
+## 2.0.1 — 2026-10-19
+- LLM API (2) default model: `qwen/qwen3.8-27b`. The previous default was retired by the provider; `openai/gpt-oss-*` emits native tool calls that text-JSON agents reject.
+
 ## 2.0.0 — 2026-04-17
 - Multi-provider router: Provider C (priority 1) → LLM API (2) → LLM API (3) with automatic fallback.
 - BYOK support: Provider A, Provider B, Provider C keys via `<ApiKeyInput>` — key stays in browser.
