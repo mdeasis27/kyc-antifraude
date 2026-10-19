@@ -5,7 +5,6 @@ import type { ChatOptions, ChatResponse } from "./types";
 import type { LLMProvider } from "./providers/base";
 import { createGeminiProvider } from "./providers/gemini";
 import { createOpenAICompatProvider } from "./providers/openai-compat";
-import { createAnthropicProvider } from "./providers/anthropic";
 import { AllProvidersFailedError, ProviderError, isRetryableError } from "./errors";
 
 function buildDefaultProviders(): LLMProvider[] {
@@ -16,7 +15,7 @@ function buildDefaultProviders(): LLMProvider[] {
       priority: 2,
       baseURL: "https://api.groq.com/openai/v1",
       apiKey: process.env.GROQ_API_KEY,
-      defaultModel: "llama-3.3-70b-versatile",
+      defaultModel: "qwen/qwen3.8-27b",
     }),
     createOpenAICompatProvider({
       name: "openrouter",

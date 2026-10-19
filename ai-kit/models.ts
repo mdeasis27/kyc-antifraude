@@ -23,8 +23,8 @@ export const MODELS = {
     "gemini-1.5-flash",
   ] as const,
   groq: [
-    "llama-3.3-70b-versatile",
-    "mixtral-8x7b-32768",
+    "qwen/qwen3.8-27b",
+    "openai/gpt-oss-120b",
   ] as const,
   openrouter: [
     "meta-llama/llama-3.3-70b-instruct:free",
